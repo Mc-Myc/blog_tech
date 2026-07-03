@@ -7,3 +7,5 @@ media/
 staticfiles/
 .pytest_cache/
 .superpowers/
+.DS_Store
+*.egg-info/
