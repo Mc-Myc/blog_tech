@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Éditeur de scènes — blog_tech studio</title>
+<link rel="stylesheet" href="proto.css">
+<script src="proto.js"></script>
+<style>
+.ed3 { display: grid; grid-template-columns: 420px 1fr; gap: 0;
+  height: calc(100vh - 60px); }
+.ed3-form { border-right: 1px solid var(--line); background: var(--bg-deep);
+  padding: 26px 26px 40px; overflow: auto; }
+.ed3-form h2 { font-family: var(--display); font-size: 22px; color: var(--ink-strong);
+  margin-bottom: 20px; }
+.fld { margin-bottom: 18px; }
+.fld label { display: block; font-family: var(--mono); font-size: 11px;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
+  margin-bottom: 7px; }
+.fld select, .fld input, .fld textarea { width: 100%; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 8px; color: var(--ink);
+  font: 13px var(--mono); padding: 10px 12px; outline: none; }
+.fld textarea { height: 130px; resize: vertical; line-height: 1.7; }
+.fld select:focus, .fld textarea:focus, .fld input:focus { border-color: var(--accent); }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chips .tag { cursor: pointer; }
+.chips .tag.sel { border-color: var(--accent); color: var(--accent); }
+.ed3-view { position: relative; overflow: hidden;
+  background: radial-gradient(ellipse at 40% 20%, #182028, var(--bg-deep) 75%); }
+.ed3-view .floor { opacity: .5; }
+.ed3-json { position: absolute; right: 18px; bottom: 18px; width: 320px;
+  max-height: 260px; overflow: auto; font: 11px/1.6 var(--mono); color: #9aa4ae;
+  background: #0a0d10dd; border: 1px solid var(--line); border-radius: 10px;
+  padding: 12px 14px; }
+.ed3-json .k { color: var(--info); } .ed3-json .s { color: #a5d6ff; }
+.mini-ring { position: absolute; left: 44%; top: 40%; }
+.mini-ring .orb { position: absolute; left: 50%; top: 50%; width: 300px; height: 190px;
+  margin: -95px 0 0 -150px; border: 2px dashed var(--accent); border-radius: 50%;
+  opacity: .35; }
+.mini-ring .core { position: absolute; left: 50%; top: 50%; width: 44px; height: 44px;
+  margin: -22px; border-radius: 99px;
+  background: radial-gradient(circle at 34% 28%, #ffd9a8, var(--accent) 58%, #7e2f21);
+  box-shadow: 0 0 26px #e8724c77, 0 18px 30px #000c; }
+.mini-ring .ln { position: absolute; font-family: var(--hand3d-font); font-weight: 700;
+  font-size: 17px; color: #d3deff; white-space: nowrap;
+  text-shadow: 1px 1px 0 #3f57a4, 2px 2px 0 #2b4185, 4px 6px 8px #000b; }
+.ed3-hint { position: absolute; left: 26px; top: 20px; z-index: 5; }
+@media (max-width: 980px) { .ed3 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="logo" href="index.html">~/blog<span class="p">_tech</span>
+      <span style="color:var(--muted);font-size:12px">/studio/éditeur-3d</span></a>
+    <div class="nav-links">
+      <a href="atlas.html">Atlas</a>
+      <a href="detecteur.html">Détecteur</a>
+    </div>
+    <div class="nav-right">
+      <button class="theme-toggle" onclick="toggleTheme()" title="clair / sombre">◐</button>
+      <a class="btn" href="studio-dashboard.html">← Dashboard</a>
+      <a class="btn solid" href="#">Insérer dans l'article</a>
+    </div>
+  </div>
+</nav>
+
+<div class="ed3">
+  <aside class="ed3-form">
+    <h2>Composer une scène pattern</h2>
+
+    <div class="fld">
+      <label>pattern (choisit la forme + la démo)</label>
+      <select>
+        <option>singleton — l'anneau orbital · démo : les 2 tours</option>
+        <option>observer — l'étoile · démo : allumer les abonnés</option>
+        <option>factory method — le tapis roulant · démo : production</option>
+        <option>decorator — les anneaux gigognes · démo : emballage</option>
+        <option>chain of responsibility — la chaîne · démo : remontée</option>
+        <option>… 17 autres formes de l'Atlas</option>
+      </select>
+    </div>
+
+    <div class="fld">
+      <label>le code (l'essence, ≤ 8 lignes — sinon passe en UML)</label>
+      <textarea spellcheck="false">class Config:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance</textarea>
+    </div>
+
+    <div class="fld">
+      <label>pourquoi c'est ce pattern (annotation bleue)</label>
+      <input value="le code s'enroule : une seule sortie, une seule instance">
+    </div>
+
+    <div class="fld">
+      <label>à quoi ça sert (mémo papier)</label>
+      <input value="config globale · pool de connexions DB · logger unique">
+    </div>
+
+    <div class="fld">
+      <label>annotations rouges (piège / à retenir)</label>
+      <div class="chips">
+        <span class="tag sel">retenir ça ! → ligne 6</span>
+        <span class="tag">+ ajouter</span>
+      </div>
+    </div>
+
+    <div class="fld">
+      <label>traductions au survol</label>
+      <div class="chips">
+        <span class="tag sel">6 lignes ✓ générées</span>
+        <span class="tag">✎ éditer</span>
+      </div>
+    </div>
+
+    <div class="fld">
+      <label>suggestion IA (à partir du code collé)</label>
+      <div class="chips">
+        <span class="tag k3d">⌁ singleton détecté (0.97)</span>
+        <span class="tag">appliquer</span>
+      </div>
+    </div>
+  </aside>
+
+  <section class="ed3-view">
+    <div class="floor"></div>
+    <div class="hand3d ed3-hint" style="font-size:24px">aperçu live
+      <small>la forme se recalcule<br>à chaque frappe</small></div>
+
+    <div class="mini-ring">
+      <span class="orb"></span><span class="core"></span>
+      <span class="ln" style="left:-40px; top:-118px">① class Config:</span>
+      <span class="ln" style="left:120px; top:-60px">② _instance = None</span>
+      <span class="ln" style="left:120px; top:36px">③ def __new__(cls):</span>
+      <span class="ln" style="left:-60px; top:86px">④ if … is None:</span>
+      <span class="ln" style="left:-230px; top:36px">⑤ … = super().__new__(cls)</span>
+      <span class="ln" style="left:-210px; top:-60px">⑥ return cls._instance</span>
+    </div>
+
+    <div class="ed3-json">
+<span class="k">{</span> "version": 2, "pattern": <span class="s">"singleton"</span>,
+  "code": { "lang": <span class="s">"python"</span>, "lignes": 7 },
+  "pourquoi": <span class="s">"le code s'enroule…"</span>,
+  "usages": [<span class="s">"config globale"</span>, <span class="s">"pool DB"</span>, <span class="s">"logger"</span>],
+  "annotations": [{ "texte": <span class="s">"retenir ça !"</span>,
+      "encre": <span class="s">"rouge"</span>, "ancre": <span class="s">"ligne:6"</span> }],
+  "demo": <span class="s">"exec-laps"</span>,
+  "camera": { "path": <span class="s">"scroll-track"</span> } <span class="k">}</span>
+    </div>
+  </section>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recherche — blog_tech</title>
+<link rel="stylesheet" href="proto.css">
+<script src="proto.js"></script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="logo" href="index.html">~/blog<span class="p">_tech</span><span class="cursor"></span></a>
+    <div class="nav-links">
+      <a href="index.html">Articles</a>
+      <a href="index.html#series">Séries</a>
+      <a class="on" href="search.html">Recherche</a>
+    </div>
+    <div class="nav-right">
+      <span class="lang"><b>FR</b> / EN</span>
+      <button class="theme-toggle" onclick="toggleTheme()" title="clair / sombre">◐</button>
+      <a class="btn" href="studio-dashboard.html">Studio →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="search-hero">
+  <p class="kicker reveal d1">// full-text postgres</p>
+  <h1 class="reveal d2" style="font-family:var(--display);font-weight:900;font-size:40px;color:var(--ink-strong);margin:10px 0 24px">
+    Retrouver cette fois où…</h1>
+  <div class="search-box reveal d3">
+    <span style="color:var(--accent)">›</span>
+    <input value="docker healthcheck" placeholder="chercher un bug, une solution, un pattern…" autofocus>
+    <span class="meta">⏎</span>
+  </div>
+  <div class="search-meta reveal d4">2 résultats · 0.04s · locale FR
+    <span style="margin-left:14px">filtres :</span>
+    <span class="tag" style="margin-left:6px">tous les kinds</span>
+    <span class="tag k3d">code_3d</span>
+    <span class="tag til">til</span>
+  </div>
+</div>
+
+<div class="results">
+  <a class="card hit reveal d4" href="article.html">
+    <div class="row"><span class="tag">docker</span><span class="tag">debugging</span></div>
+    <h3>Trois heures sur un <mark>healthcheck</mark> <mark>Docker</mark> qui mentait</h3>
+    <p>…le conteneur était "healthy", l'app était morte. Le <mark>healthcheck</mark> utilisait
+      curl, absent de l'image slim, et certaines configs le font passer pour réussi…</p>
+    <div class="row" style="margin-top:12px"><span class="meta">2026-06-21 · 7 min · pertinence 0.92</span></div>
+  </a>
+
+  <a class="card hit reveal d5" href="article.html">
+    <div class="row"><span class="tag til">til</span><span class="tag">docker</span></div>
+    <h3>TIL : <mark>healthcheck</mark> et start_period, l'option que j'ignorais</h3>
+    <p>…le start_period laisse le temps au conteneur de démarrer avant que les échecs
+      de <mark>healthcheck</mark> ne comptent…</p>
+    <div class="row" style="margin-top:12px"><span class="meta">2026-05-30 · 2 min · pertinence 0.71</span></div>
+  </a>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Marcel Yapo</span>
+    <a href="#">RSS</a><a href="#">llms.txt</a>
+    <span style="margin-left:auto">fait avec Django + Next.js + Claude Code</span>
+  </div>
+</footer>
+
+</body>
+</html>

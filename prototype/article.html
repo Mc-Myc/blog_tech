@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trois heures sur un healthcheck Docker qui mentait — blog_tech</title>
+<link rel="stylesheet" href="proto.css">
+<script src="proto.js"></script>
+</head>
+<body>
+
+<div class="progress"></div>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="logo" href="index.html">~/blog<span class="p">_tech</span><span class="cursor"></span></a>
+    <div class="nav-links">
+      <a class="on" href="index.html">Articles</a>
+      <a href="index.html#series">Séries</a>
+      <a href="search.html">Recherche</a>
+    </div>
+    <div class="nav-right">
+      <span class="lang"><b>FR</b> / EN</span>
+      <button class="theme-toggle" onclick="toggleTheme()" title="clair / sombre">◐</button>
+      <a class="btn" href="#" title="copier l'article en markdown">⧉ .md</a>
+    </div>
+  </div>
+</nav>
+
+<header class="art-head">
+  <div class="crumb">
+    <a href="index.html">accueil</a><span class="sep">/</span>
+    <a href="index.html#series">mes galères docker</a><span class="sep">/</span>
+    <span>healthcheck menteur</span>
+  </div>
+  <div class="row" style="display:flex;gap:10px">
+    <span class="tag">docker</span><span class="tag">debugging</span>
+    <span class="meta" style="margin-left:6px">Série : Mes galères Docker avec Claude · 2/4</span>
+  </div>
+  <h1>Trois heures sur un healthcheck Docker qui mentait</h1>
+  <div class="meta">2026-06-21 · 7 min de lecture · par Marcel</div>
+</header>
+
+<div class="art-grid with-rail">
+  <aside class="toc">
+    <h5>Sommaire</h5>
+    <a class="on" href="#symptome">Le symptôme</a>
+    <a href="#tente">Ce que Claude a tenté</a>
+    <a href="#coupable">Le coupable</a>
+    <a href="#lecon">La leçon</a>
+  </aside>
+
+  <article class="prose">
+    <p class="lead">Le conteneur était <code>healthy</code>. L'application était morte.
+      Pendant trois heures, ces deux phrases ont été vraies en même temps.</p>
+
+    <h2 id="symptome">Le symptôme</h2>
+    <p>Tout commence par un déploiement banal. <code>docker compose up -d</code>,
+      les services passent au vert, et pourtant le front renvoie des 502.
+      Je lance une session Claude Code et je lui décris le problème.</p>
+
+    <div class="codeblock">
+      <div class="bar"><span>●</span> docker-compose.yml <span class="copy">⧉ copier</span></div>
+      <pre><span class="tok-n">healthcheck</span>:
+  <span class="tok-n">test</span>: [<span class="tok-s">"CMD"</span>, <span class="tok-s">"curl"</span>, <span class="tok-s">"-f"</span>, <span class="tok-s">"http://localhost:8000/health"</span>]
+  <span class="tok-n">interval</span>: <span class="tok-s">30s</span>
+  <span class="tok-n">retries</span>: <span class="tok-s">3</span>  <span class="tok-c"># ← tout a l'air normal, non ?</span></pre>
+    </div>
+
+    <h2 id="tente">Ce que Claude a tenté</h2>
+    <p>Claude a d'abord fait ce que j'aurais dû faire : vérifier que le healthcheck
+      teste bien ce qu'on croit qu'il teste. Spoiler : non. L'image de prod était
+      basée sur <code>python:slim</code> — et <code>curl</code> n'y est pas installé.</p>
+
+    <div class="callout cahier">
+      <span class="rouge pen-underline">le piège</span> — quand la commande d'un healthcheck
+      n'existe pas, certaines configs le font passer pour <b>réussi</b> au lieu d'échouer.
+      Le mensonge parfait.
+    </div>
+
+    <h2 id="coupable">Le coupable</h2>
+    <p>Un healthcheck qui ne peut pas s'exécuter n'est pas un healthcheck qui échoue.
+      La solution tenait en une ligne : remplacer curl par un outil réellement
+      présent dans l'image.</p>
+
+    <div class="codeblock">
+      <div class="bar"><span>●</span> fix <span class="copy">⧉ copier</span></div>
+      <pre><span class="tok-n">test</span>: [<span class="tok-s">"CMD"</span>, <span class="tok-s">"python"</span>, <span class="tok-s">"-c"</span>,
+  <span class="tok-s">"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"</span>]</pre>
+    </div>
+
+    <h2 id="lecon">La leçon</h2>
+    <p>Un test qui ne peut pas échouer n'est pas un test. C'est vrai pour les
+      healthchecks, c'est vrai pour les tests unitaires, c'est la base du TDD que
+      Claude me rappelle à chaque session : voir le test échouer d'abord.</p>
+
+    <div class="art-foot">
+      <span class="clap">👏 <b>128</b></span>
+      <span class="meta">réactions anonymes — pas de compte requis</span>
+    </div>
+
+    <div class="author-card">
+      <div class="avatar">MY</div>
+      <div class="who">
+        <b>Marcel Yapo</b>
+        <p>Dev full-stack. Je documente tout ce que je casse et répare avec Claude Code —
+          et parfois, je le mets en relief.</p>
+      </div>
+      <a class="btn" style="margin-left:auto" href="index.html">+ d'articles</a>
+    </div>
+
+    <div class="newsletter">
+      <span class="hand-arrow">pas de spam, promis ✍</span>
+      <h4>Un email quand un article sort</h4>
+      <p>Ou l'option zéro-engagement : le bon vieux flux RSS.</p>
+      <div class="nl-row">
+        <input placeholder="ton@email.dev">
+        <a class="btn solid" href="#">S'abonner</a>
+        <a class="btn" href="#">RSS ⤓</a>
+      </div>
+    </div>
+
+    <div class="pn">
+      <a href="article.html">
+        <div class="dir">← précédent</div>
+        <div class="t">TIL : le start_period des healthchecks</div>
+      </a>
+      <a class="next" href="article-3d.html">
+        <div class="dir">suivant →</div>
+        <div class="t">Le singleton que Claude refusait d'écrire</div>
+      </a>
+    </div>
+
+    <div class="related">
+      <div class="h2s">— À lire aussi</div>
+      <div class="related-grid">
+        <a class="rel-card" href="article-3d.html">
+          <span class="tag k3d">code_3d</span>
+          <h6>Le singleton que Claude refusait d'écrire</h6>
+          <div class="meta">9 min · scène 3D</div>
+        </a>
+        <a class="rel-card" href="article.html">
+          <span class="tag">django</span>
+          <h6>Hexagonal pragmatique en Django</h6>
+          <div class="meta">11 min</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="comments">
+      <div class="h2s">— 1 commentaire <span style="opacity:.6">(modérés avant publication)</span></div>
+      <div class="comment">
+        <div class="avatar">A</div>
+        <div class="body">
+          <div class="h"><b>alex_ops</b><span class="meta">il y a 1 jour</span></div>
+          Le coup du healthcheck qui "réussit" parce que curl n'existe pas… vécu aussi.
+          Merci pour le fix en pur python.
+        </div>
+      </div>
+      <div class="comment-form">
+        <input placeholder="Ajouter un commentaire (nom optionnel)…">
+        <a class="btn solid" href="#">Envoyer</a>
+      </div>
+      <div class="mod-note">// les commentaires passent en file de modération dans le studio</div>
+    </div>
+  </article>
+
+  <aside class="share-rail">
+    <span class="clap" style="flex-direction:column;padding:10px 6px;border-radius:12px">👏<b>128</b></span>
+    <button title="partager sur X">𝕏</button>
+    <button title="partager sur LinkedIn">in</button>
+    <button title="copier le lien">⧉</button>
+    <a href="#" title="copier en markdown">.md</a>
+  </aside>
+</div>
+
+<button class="back-top" title="retour en haut">↑</button>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Marcel Yapo</span>
+    <a href="#">RSS</a><a href="#">llms.txt</a>
+    <span style="margin-left:auto">fait avec Django + Next.js + Claude Code</span>
+  </div>
+</footer>
+
+</body>
+</html>

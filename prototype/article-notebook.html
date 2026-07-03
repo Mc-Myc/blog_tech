@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fine-tuner BERT sur du droit : 100 % d'accuracy, et pourtant tout était faux — blog_tech</title>
+<link rel="stylesheet" href="proto.css">
+<script src="proto.js"></script>
+</head>
+<body>
+
+<div class="progress"></div>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="logo" href="index.html">~/blog<span class="p">_tech</span><span class="cursor"></span></a>
+    <div class="nav-links">
+      <a class="on" href="index.html">Articles</a>
+      <a href="index.html#series">Séries</a>
+      <a href="search.html">Recherche</a>
+    </div>
+    <div class="nav-right">
+      <span class="lang"><b>FR</b> / EN</span>
+      <button class="theme-toggle" onclick="toggleTheme()" title="clair / sombre">◐</button>
+      <a class="btn" href="#" title="copier l'article en markdown">⧉ .md</a>
+    </div>
+  </div>
+</nav>
+
+<header class="art-head">
+  <div class="crumb">
+    <a href="index.html">accueil</a><span class="sep">/</span>
+    <a href="index.html#series">ai &amp; ml</a><span class="sep">/</span>
+    <span>bert juridique</span>
+  </div>
+  <div class="row" style="display:flex;gap:10px">
+    <span class="tag k3d">code_3d</span><span class="tag">machine-learning</span>
+    <span class="tag">nlp</span><span class="tag">colab</span>
+    <span class="meta" style="margin-left:6px">issu du notebook model_juridique.ipynb · 54 cellules</span>
+  </div>
+  <h1>Fine-tuner BERT sur du droit : 100 % d'accuracy, et pourtant tout était faux</h1>
+  <div class="meta">2026-07-02 · 14 min · 4 erreurs, 1 mensonge statistique, 1 leçon</div>
+</header>
+
+<div class="art-grid with-rail">
+  <aside class="toc">
+    <h5>Pipeline</h5>
+    <a class="on" href="#projet">Le projet</a>
+    <a href="#donnees">1 · Les données</a>
+    <a href="#piege1">2 · Piège : NameError</a>
+    <a href="#training">3 · Fine-tuning BERT</a>
+    <a href="#mensonge">4 · Le mensonge du 100 %</a>
+    <a href="#crashs">5 · Les deux crashs</a>
+    <a href="#lecons">Ce que je retiens</a>
+  </aside>
+
+  <article class="prose">
+    <p class="lead" id="projet">Je voulais un moteur de recherche juridique intelligent :
+      classer des textes de loi avec BERT, générer des résumés avec BLOOM, indexer le tout
+      dans Elasticsearch. Voici ce qui s'est vraiment passé, cellule par cellule.</p>
+
+    <p>D'abord, la carte du pipeline — vert : ça passe, jaune : ça passe mais méfiance,
+      rouge : crash. Clique sur une étape pour y sauter :</p>
+
+    <div class="pipeline">
+      <a class="pstep" href="#donnees"><span class="dot"></span><b>setup</b>Colab + Drive</a>
+      <a class="pstep err" href="#piege1"><span class="dot"></span><b>merge</b>2 datasets</a>
+      <a class="pstep" href="#donnees"><span class="dot"></span><b>clean</b>regex + dédup</a>
+      <a class="pstep" href="#training"><span class="dot"></span><b>train</b>BERT multiling.</a>
+      <a class="pstep warn" href="#mensonge"><span class="dot"></span><b>eval</b>100 % ?!</a>
+      <a class="pstep err" href="#crashs"><span class="dot"></span><b>index</b>Elasticsearch</a>
+      <a class="pstep err" href="#crashs"><span class="dot"></span><b>gen</b>BLOOM 560m</a>
+    </div>
+
+    <h2 id="donnees">1 · Les données : deux mondes juridiques à réconcilier</h2>
+    <p>Deux sources : un scraping de codes français (title, excerpt, full_text…) et un
+      export de régulations européennes (Titre, Description, URL). Deux schémas
+      différents qu'il faut harmoniser avant de fusionner :</p>
+
+    <table class="df-table">
+      <tr><th>colonne cible</th><th>dataset 1 (codes fr)</th><th>dataset 2 (régl. eu)</th></tr>
+      <tr><td>Title</td><td>title</td><td>Titre</td></tr>
+      <tr><td>Description</td><td>excerpt</td><td>Description</td></tr>
+      <tr><td>FullText</td><td>full_text</td><td class="num">∅ (placeholder None)</td></tr>
+      <tr><td>Category</td><td>category</td><td class="num">"European Regulations" (défaut)</td></tr>
+    </table>
+
+    <h2 id="piege1" class="has-margin">2 · Premier piège : le notebook qui ment sur son propre état</h2>
+    <div class="note3d rouge margin-left-note">l'ordre des<br>cellules ≠ l'ordre<br>d'exécution !</div>
+    <p>La cellule de renommage est écrite <em>avant</em> le chargement dans le fichier…
+      mais je l'ai exécutée après un redémarrage du runtime. Résultat :</p>
+
+    <div class="nb-cell">
+      <div class="nb-head"><span class="idx">In [15]</span> renommage des colonnes <span class="copy">⧉ copier</span></div>
+      <pre><span class="tok-c"># Renommer les colonnes du dataset 1</span>
+dataset1 = dataset1.rename(columns={
+    <span class="tok-s">'category'</span>: <span class="tok-s">'Category'</span>,
+    <span class="tok-s">'title'</span>: <span class="tok-s">'Title'</span>,
+    <span class="tok-s">'excerpt'</span>: <span class="tok-s">'Description'</span>, <span class="tok-c"># …</span>
+})</pre>
+      <details class="nb-err" open>
+        <summary><span class="lbl">erreur</span> <span class="ename">NameError</span> : name 'dataset1' is not defined</summary>
+        <div class="traceback">---------------------------------------------------------------
+NameError                       Traceback (most recent call last)
+&lt;ipython-input-15&gt; in &lt;cell line: 2&gt;()
+      1 # Renommer les colonnes du dataset 1
+----&gt; 2 dataset1 = dataset1.rename(columns={
+      3     'category': 'Category',
+
+NameError: name 'dataset1' is not defined</div>
+      </details>
+    </div>
+
+    <div class="verdict-box">
+      <span class="t">// le diagnostic</span>
+      Un notebook n'est pas un script : son état vit dans le kernel, pas dans le fichier.
+      Après un restart, chaque cellule qui dépend d'une variable doit être ré-exécutée
+      dans l'ordre. Fix : <code>Run all above</code>, ou mieux — regrouper le chargement
+      et la préparation dans une même cellule idempotente.
+    </div>
+
+    <h2 id="training">3 · Fine-tuning de BERT multilingue</h2>
+    <p>Le cœur du projet : <code>bert-base-multilingual-cased</code>, classification
+      binaire « Codes » vs « Autres », 512 tokens max, split 80/20.</p>
+
+    <div class="nb-cell">
+      <div class="nb-head"><span class="idx">In [35]</span> chargement + tokenization <span class="copy">⧉ copier</span></div>
+      <pre>tokenizer = AutoTokenizer.from_pretrained(<span class="tok-s">"bert-base-multilingual-cased"</span>)
+model = AutoModelForSequenceClassification.from_pretrained(
+    <span class="tok-s">"bert-base-multilingual-cased"</span>, num_labels=<span class="tok-n">2</span>)
+
+train_texts, val_texts, train_labels, val_labels = train_test_split(
+    data[<span class="tok-s">'context'</span>].values,
+    data[<span class="tok-s">'Category'</span>].apply(<span class="tok-k">lambda</span> x: <span class="tok-n">0</span> <span class="tok-k">if</span> x == <span class="tok-s">"Codes"</span> <span class="tok-k">else</span> <span class="tok-n">1</span>).values,
+    test_size=<span class="tok-n">0.2</span>)</pre>
+      <div class="nb-warn"><span class="lbl">warnings (2)</span>The secret `HF_TOKEN` does not exist in your Colab secrets.
+Some weights of BertForSequenceClassification were not initialized […] You should probably TRAIN this model on a down-stream task.</div>
+    </div>
+
+    <p>Les warnings sont normaux ici (tête de classification neuve = c'est justement ce
+      qu'on va entraîner). L'entraînement tourne sur le GPU Colab, loggé dans W&amp;B.</p>
+
+    <h2 id="mensonge" class="has-margin">4 · Le mensonge du 100 %</h2>
+    <div class="note3d rouge margin-left-note">trop beau pour<br>être vrai <span class="fleche">→</span></div>
+    <p>Et là, le rapport de classification tombe — parfait. Trop parfait :</p>
+
+    <div class="nb-cell">
+      <div class="nb-head"><span class="idx">Out [41]</span> classification_report</div>
+      <div class="nb-out"><span class="lbl">stdout</span>              precision    recall  f1-score   support
+
+       Codes       1.00      1.00      1.00        18
+      Autres       1.00      1.00      1.00      2808
+
+    accuracy                           1.00      2826</div>
+    </div>
+
+    <div class="bars">
+      <div class="bar-row"><span>Codes (18)</span><div class="track"><div class="fill sus" style="width:100%"></div></div><span>1.00 ⚠</span></div>
+      <div class="bar-row"><span>Autres (2808)</span><div class="track"><div class="fill" style="width:100%"></div></div><span>1.00</span></div>
+    </div>
+
+    <p>Regarde la colonne <code>support</code> : <strong>18 exemples « Codes » contre
+      2808 « Autres »</strong>. Avec un déséquilibre pareil, un modèle qui répondrait
+      « Autres » les yeux fermés aurait déjà 99,4 % d'accuracy. Le 100 % ne prouve
+      pas que le modèle comprend le droit — il prouve que la tâche, telle que posée,
+      est triviale.</p>
+
+    <div class="verdict-box">
+      <span class="t">// ce que j'aurais dû voir avant d'entraîner</span>
+      Vérifier <code>data['Category'].value_counts()</code> AVANT le split. Corriger par
+      sous-échantillonnage, sur-échantillonnage, pondération des classes — ou repenser
+      les labels : « Codes vs Autres » n'était peut-être pas la bonne question à poser
+      à ces données.
+    </div>
+
+    <h2 id="crashs">5 · Les deux crashs de fin de course</h2>
+
+    <p><strong>Elasticsearch d'abord.</strong> Indexer les documents… sur
+      <code>localhost:9200</code>. Sauf qu'un notebook Colab est une VM éphémère :
+      il n'y a pas d'Elasticsearch qui écoute en local.</p>
+
+    <div class="nb-cell">
+      <div class="nb-head"><span class="idx">In [43]</span> indexation Elasticsearch</div>
+      <pre>es = Elasticsearch(<span class="tok-s">"http://localhost:9200"</span>)  <span class="tok-c"># ← dans Colab ?!</span></pre>
+      <details class="nb-err">
+        <summary><span class="lbl">erreur</span> <span class="ename">ConnectionError</span> : Failed to establish a new connection [Errno 111]</summary>
+        <div class="traceback">WARNING:elastic_transport.node_pool:Node &lt;Urllib3HttpNode(http://localhost:9200)&gt;
+has failed for 1 times in a row, putting on 1 second timeout
+Retrying request after failure (attempt 0 of 3)
+ConnectionError: Connection error caused by: NewConnectionError(
+  Failed to establish a new connection: [Errno 111] Connection refused)</div>
+      </details>
+    </div>
+
+    <p><strong>Puis BLOOM.</strong> Le fine-tuning génératif réutilise
+      <code>train_texts</code>… qui est devenu un <code>numpy.ndarray</code> après le
+      <code>train_test_split</code>. Et numpy n'a pas de méthode <code>.apply</code> —
+      c'était du pandas dans ma tête :</p>
+
+    <div class="nb-cell">
+      <div class="nb-head"><span class="idx">In [45]</span> préparation BLOOM</div>
+      <pre>train_texts_bloom = train_texts.apply(<span class="tok-k">lambda</span> x: <span class="tok-s">f"Texte: {x}"</span>).tolist()</pre>
+      <details class="nb-err">
+        <summary><span class="lbl">erreur</span> <span class="ename">AttributeError</span> : 'numpy.ndarray' object has no attribute 'apply'</summary>
+        <div class="traceback">AttributeError                  Traceback (most recent call last)
+&lt;ipython-input-45&gt; in &lt;cell line: 8&gt;()
+----&gt; 8 train_texts_bloom = train_texts.apply(lambda x: f"Texte: {x}")
+
+AttributeError: 'numpy.ndarray' object has no attribute 'apply'</div>
+      </details>
+    </div>
+
+    <div class="verdict-box">
+      <span class="t">// les fixes</span>
+      Elasticsearch : un service managé (Elastic Cloud, Bonsai) ou l'installer dans la VM
+      Colab le temps de la session. BLOOM : <code>[f"Texte: {x}" for x in train_texts]</code> —
+      une list-comprehension ne demande pas la permission de pandas.
+    </div>
+
+    <h2 id="lecons">Ce que je retiens</h2>
+    <p>① Regarder la distribution des classes <em>avant</em> de célébrer une métrique.
+      ② Un notebook qui affiche 54 cellules propres peut cacher un état de kernel
+      chaotique — l'ordre du fichier n'est pas l'ordre d'exécution.
+      ③ Colab n'est pas ta machine : pas de localhost, pas de persistance.
+      ④ <code>.values</code> transforme silencieusement ton pandas en numpy — et les
+      erreurs n'apparaissent que 10 cellules plus loin.</p>
+
+    <div class="art-foot">
+      <span class="clap">👏 <b>52</b></span>
+      <span class="meta">réactions anonymes — pas de compte requis</span>
+    </div>
+
+    <div class="newsletter">
+      <span class="hand-arrow">pas de spam, promis ✍</span>
+      <h4>Un email quand un article sort</h4>
+      <p>Ou l'option zéro-engagement : le bon vieux flux RSS.</p>
+      <div class="nl-row">
+        <input placeholder="ton@email.dev">
+        <a class="btn solid" href="#">S'abonner</a>
+        <a class="btn" href="#">RSS ⤓</a>
+      </div>
+    </div>
+
+    <div class="pn">
+      <a href="article-3d.html">
+        <div class="dir">← précédent</div>
+        <div class="t">Le singleton que Claude refusait d'écrire</div>
+      </a>
+      <a class="next" href="article.html">
+        <div class="dir">suivant →</div>
+        <div class="t">Trois heures sur un healthcheck Docker qui mentait</div>
+      </a>
+    </div>
+  </article>
+
+  <aside class="share-rail">
+    <span class="clap" style="flex-direction:column;padding:10px 6px;border-radius:12px">👏<b>52</b></span>
+    <button title="partager sur X">𝕏</button>
+    <button title="partager sur LinkedIn">in</button>
+    <button title="copier le lien">⧉</button>
+    <a href="#" title="copier en markdown">.md</a>
+  </aside>
+</div>
+
+<button class="back-top" title="retour en haut">↑</button>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Marcel Yapo</span>
+    <a href="#">RSS</a><a href="#">llms.txt</a>
+    <span style="margin-left:auto">fait avec Django + Next.js + Claude Code</span>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le singleton que Claude refusait d'écrire — blog_tech</title>
+<link rel="stylesheet" href="proto.css">
+<script src="proto.js"></script>
+<script>
+function replayScene() {
+  const s = document.getElementById('ring-scene');
+  s.classList.remove('reveal'); void s.offsetWidth; s.classList.add('reveal');
+}
+function toggleFlat(btn) {
+  const f = document.getElementById('flat-singleton');
+  f.hidden = !f.hidden;
+  btn.textContent = f.hidden ? '⧉ voir à plat / copier' : '✍ revenir au manuscrit';
+}
+</script>
+</head>
+<body>
+
+<div class="progress"></div>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="logo" href="index.html">~/blog<span class="p">_tech</span><span class="cursor"></span></a>
+    <div class="nav-links">
+      <a class="on" href="index.html">Articles</a>
+      <a href="index.html#series">Séries</a>
+      <a href="search.html">Recherche</a>
+    </div>
+    <div class="nav-right">
+      <span class="lang"><b>FR</b> / EN</span>
+      <button class="theme-toggle" onclick="toggleTheme()" title="clair / sombre">◐</button>
+      <a class="btn" href="#" title="copier l'article en markdown">⧉ .md</a>
+    </div>
+  </div>
+</nav>
+
+<header class="art-head">
+  <div class="crumb">
+    <a href="index.html">accueil</a><span class="sep">/</span>
+    <a href="index.html#series">design patterns en relief</a><span class="sep">/</span>
+    <span>singleton</span>
+  </div>
+  <div class="row" style="display:flex;gap:10px">
+    <span class="tag k3d">code_3d</span><span class="tag">python</span><span class="tag">design-patterns</span>
+  </div>
+  <div class="title3d hand-title" style="font-size:54px">
+    <span class="mini">design pattern nº1</span>Singleton
+  </div>
+  <h1>Le singleton que Claude refusait d'écrire (et il avait raison)</h1>
+  <div class="meta">2026-06-28 · 9 min · le code s'écrit en scrollant — <span style="color:var(--accent)">survole une ligne pour la traduction</span></div>
+</header>
+
+<div class="art-grid with-rail">
+  <aside class="toc">
+    <h5>Sommaire</h5>
+    <a class="on" href="#demande">La demande</a>
+    <a href="#formes">Les formes des patterns</a>
+    <a href="#contre">Le contre-argument</a>
+    <a href="#verdict">Verdict</a>
+  </aside>
+
+  <article class="prose">
+    <p class="lead" id="demande">« Fais-moi un singleton pour la config. » Réponse de Claude :
+      « On peut, mais est-ce qu'on devrait ? » Voici le code — écrit à la main,
+      enroulé dans sa propre forme.</p>
+
+    <p>Scrolle : le code s'écrit ligne à ligne autour de l'instance unique. Puis
+      la bille d'exécution fait ses deux tours — regarde bien la différence entre
+      le premier appel et les suivants :</p>
+
+    <!-- ═══════ LE CODE MANUSCRIT 3D EN FORME DE SINGLETON ═══════ -->
+    <div class="scene-wrap">
+      <div class="hud" style="z-index:10">
+        <span class="tag k3d">scene v2 · le code EST l'anneau</span>
+      </div>
+
+      <div class="scene-stage reveal-scroll" id="ring-scene" style="height:660px">
+        <div class="floor"></div>
+
+        <!-- l'orbite : le chemin que le code dessine -->
+        <div style="position:absolute; left:50%; top:46%; width:570px; height:360px;
+             margin:-180px 0 0 -285px; border:2px dashed var(--accent);
+             border-radius:50%; opacity:.28; box-shadow:0 0 24px var(--accent-soft)"></div>
+
+        <!-- le noyau : l'instance unique -->
+        <div class="core3d" style="left:50%; top:46%">
+          <span class="lbl">l'instance unique</span>
+        </div>
+
+        <!-- la bille d'exécution : tour 1 lent (crée), tour 2 rapide (réutilise) -->
+        <div class="exec-dot" style="offset-path: path('M 470 124 A 285 180 0 1 1 469.9 124 Z')"></div>
+        <!-- lueur ambiante qui parcourt l'orbite en continu -->
+        <div class="orbit-glow" style="offset-path: path('M 470 124 A 285 180 0 1 1 469.9 124 Z')"></div>
+
+        <!-- LE CODE, MANUSCRIT, EN ANNEAU — ordre de lecture ① → ⑥ -->
+        <div class="code-hand w1" style="left:524px; top:116px; transform:translate(-50%,-50%) rotate(-3deg)">
+          <span class="n">①</span><span class="kw">class</span> Config:
+          <span class="tip"><code>class Config:</code>on déclare la classe — il n'en sortira qu'un seul objet</span>
+        </div>
+        <div class="code-hand w2" style="left:688px; top:240px; transform:translate(-50%,-50%) rotate(6deg)">
+          <span class="n">②</span>_instance = <span class="kw">None</span>
+          <span class="tip"><code>_instance = None</code>la place de l'instance unique — vide au départ</span>
+        </div>
+        <div class="code-hand w3" style="left:716px; top:398px; transform:translate(-50%,-50%) rotate(-5deg)">
+          <span class="n">③</span><span class="kw">def</span> __new__(cls):
+          <span class="tip"><code>def __new__(cls):</code>le portier : TOUTE création d'objet passe par ici</span>
+        </div>
+        <div class="code-hand w4" style="left:470px; top:494px; transform:translate(-50%,-50%) rotate(2deg)">
+          <span class="n">④</span><span class="kw">if</span> cls._instance <span class="kw">is</span> None:
+          <span class="tip"><code>if cls._instance is None:</code>première visite ? alors seulement on fabrique</span>
+        </div>
+        <div class="code-hand w5" style="left:242px; top:398px; transform:translate(-50%,-50%) rotate(-6deg); font-size:23px">
+          <span class="n">⑤</span>cls._instance = <span class="kw">super</span>().__new__(cls)
+          <span class="tip"><code>cls._instance = super().__new__(cls)</code>la SEULE ligne qui crée — exécutée une fois dans toute la vie du programme</span>
+        </div>
+        <div class="code-hand w6" style="left:278px; top:224px; transform:translate(-50%,-50%) rotate(5deg)">
+          <span class="n">⑥</span><span class="kw">return</span> cls._instance
+          <span class="tip"><code>return cls._instance</code>tout le monde repart avec LE même objet</span>
+        </div>
+
+        <!-- pourquoi c'est un singleton -->
+        <div class="hand3d sticker" style="left:30px; top:104px; font-size:28px">
+          pourquoi « singleton » ?
+          <small>le code s'enroule : une seule<br>sortie, une seule instance.</small>
+        </div>
+        <svg class="ink-arrow" style="left:150px; top:236px" width="240" height="90">
+          <path d="M12 8 C 80 34, 160 58, 222 76"/>
+          <polygon points="222,76 206,72 210,60"/>
+        </svg>
+
+        <!-- à quoi ça sert : le mémo papier isométrique -->
+        <div class="paper-iso" style="position:absolute; right:8px; top:8px; z-index:8; font-size:16px; --lh:22px">
+          <span class="titre pen-underline">ça sert à…</span><br>
+          config globale,<br>
+          pool de connexions DB,<br>
+          logger unique<br>
+          <span class="rouge">→ tout ce qui doit</span><br>
+          <span class="rouge">exister en 1 exemplaire</span>
+        </div>
+
+        <!-- la légende des deux tours -->
+        <div class="exec-legend" style="left:38px; bottom:92px">
+          <span class="t1">● 1ᵉʳ appel : la bille fait le grand tour — elle CRÉE</span><br>
+          <span class="t2">● appels suivants : tour éclair — elle RÉUTILISE</span>
+        </div>
+
+        <div class="scene-hud-bottom" style="z-index:10">
+          <span class="ctrl" onclick="replayScene()">✍ rejouer l'écriture</span>
+          <span class="ctrl" onclick="toggleFlat(this)">⧉ voir à plat / copier</span>
+          <span style="margin-left:auto">rendu final : React Three Fiber · fallback 2D auto</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- LE MÊME CODE, À PLAT — pour copier, pour les machines, pour l'accessibilité -->
+    <div class="codeblock" id="flat-singleton" hidden>
+      <div class="bar"><span>●</span> config.py — version à plat <span class="copy">⧉ copier</span></div>
+      <pre><span class="tok-k">class</span> <span class="tok-f">Config</span>:
+    _instance = <span class="tok-k">None</span>
+
+    <span class="tok-k">def</span> <span class="tok-f">__new__</span>(cls):
+        <span class="tok-k">if</span> cls._instance <span class="tok-k">is None</span>:
+            cls._instance = <span class="tok-f">super</span>().__new__(cls)
+        <span class="tok-k">return</span> cls._instance</pre>
+    </div>
+
+    <h2 id="formes">Les formes des patterns</h2>
+    <p>Chaque design pattern a sa <em>forme signature</em> — et son moment « aha »
+      animé : le singleton fait ses deux tours, l'observer allume ses abonnés un
+      à un, la factory produit en continu :</p>
+
+    <div class="pattern-gallery">
+      <div class="pcard">
+        <span class="hand-lbl">celui-ci ↑</span>
+        <div class="pviz">
+          <div class="mini-singleton">
+            <span class="ring"></span><span class="ring r2"></span><span class="core"></span>
+          </div>
+        </div>
+        <h5>singleton</h5>
+        <p>un noyau, un anneau : l'instance unique en orbite</p>
+      </div>
+      <div class="pcard">
+        <div class="pviz">
+          <svg class="mini-observer" viewBox="0 0 110 110">
+            <line class="ray" x1="55" y1="55" x2="55" y2="12"/>
+            <line class="ray" x1="55" y1="55" x2="94" y2="34"/>
+            <line class="ray" x1="55" y1="55" x2="94" y2="80"/>
+            <line class="ray" x1="55" y1="55" x2="55" y2="98"/>
+            <line class="ray" x1="55" y1="55" x2="16" y2="80"/>
+            <line class="ray" x1="55" y1="55" x2="16" y2="34"/>
+            <circle class="hub" cx="55" cy="55" r="9"/>
+            <circle class="sub" cx="55" cy="12" r="5"/><circle class="sub" cx="94" cy="34" r="5"/>
+            <circle class="sub" cx="94" cy="80" r="5"/><circle class="sub" cx="55" cy="98" r="5"/>
+            <circle class="sub" cx="16" cy="80" r="5"/><circle class="sub" cx="16" cy="34" r="5"/>
+          </svg>
+        </div>
+        <h5>observer</h5>
+        <p>l'étoile : l'événement part du centre et allume les abonnés</p>
+      </div>
+      <div class="pcard">
+        <div class="pviz">
+          <div class="mini-factory">
+            <div class="machine"></div>
+            <div class="box"></div><div class="box b2"></div>
+            <div class="belt"></div>
+          </div>
+        </div>
+        <h5>factory</h5>
+        <p>le tapis roulant : la machine produit les objets</p>
+      </div>
+    </div>
+
+    <div class="callout cahier">
+      <span class="rouge pen-underline">note du cahier</span> — cette scène est le
+      prototype CSS du widget. En production : React Three Fiber, vraie extrusion du
+      trait, caméra qui suit l'anneau pendant l'écriture, puis orbite libre à la souris.
+    </div>
+
+    <p style="margin-top:30px">Et voilà ce que la scène devient quand tu partages
+      l'article — l'image Open Graph est générée depuis la forme du pattern :</p>
+
+    <div class="og-preview">
+      <div class="og-img">
+        <div class="floor"></div>
+        <div class="title3d" style="font-size:40px; position:absolute; left:28px; top:52px">
+          <span class="mini">design pattern nº1</span>Singleton
+        </div>
+        <div class="mini-singleton" style="position:absolute; right:44px; top:46px">
+          <span class="ring"></span><span class="ring r2"></span><span class="core"></span>
+        </div>
+      </div>
+      <div class="og-meta">
+        <div class="dom">blog-tech.dev</div>
+        <div class="ttl">Le singleton que Claude refusait d'écrire (et il avait raison)</div>
+      </div>
+    </div>
+
+    <h2 id="contre">Le contre-argument</h2>
+    <p>Claude a pointé trois problèmes : les tests qui partagent un état global,
+      l'import qui cache la dépendance, et le couplage invisible entre modules.
+      Sa proposition : une injection de dépendances explicite — la config se crée
+      une fois au démarrage, puis <em>descend</em> dans les composants.</p>
+
+    <h2 id="verdict">Verdict</h2>
+    <p>J'ai gardé l'injection. Le singleton reste au musée — dans sa vitrine 3D
+      ci-dessus, enroulé pour toujours. Il avait raison, cette fois.</p>
+
+    <div class="art-foot">
+      <span class="clap">👏 <b>340</b></span>
+      <span class="meta">réactions anonymes — pas de compte requis</span>
+    </div>
+
+    <div class="author-card">
+      <div class="avatar">MY</div>
+      <div class="who">
+        <b>Marcel Yapo</b>
+        <p>Dev full-stack. Je documente tout ce que je casse et répare avec Claude Code —
+          et parfois, je le mets en relief.</p>
+      </div>
+      <a class="btn" style="margin-left:auto" href="index.html">+ d'articles</a>
+    </div>
+
+    <div class="newsletter">
+      <span class="hand-arrow">pas de spam, promis ✍</span>
+      <h4>Un email quand un article sort</h4>
+      <p>Ou l'option zéro-engagement : le bon vieux flux RSS.</p>
+      <div class="nl-row">
+        <input placeholder="ton@email.dev">
+        <a class="btn solid" href="#">S'abonner</a>
+        <a class="btn" href="#">RSS ⤓</a>
+      </div>
+    </div>
+
+    <div class="pn">
+      <a href="article.html">
+        <div class="dir">← précédent</div>
+        <div class="t">Trois heures sur un healthcheck Docker qui mentait</div>
+      </a>
+      <a class="next" href="article-archi.html">
+        <div class="dir">suivant →</div>
+        <div class="t">Un verdict de fraude ne se met pas en cache</div>
+      </a>
+    </div>
+
+    <div class="comments">
+      <div class="h2s">— 2 commentaires <span style="opacity:.6">(modérés avant publication)</span></div>
+      <div class="comment">
+        <div class="avatar">S</div>
+        <div class="body">
+          <div class="h"><b>sofia_dev</b><span class="meta">il y a 2 jours</span></div>
+          Le code qui s'écrit en anneau et la bille qui fait ses deux tours…
+          j'ai enfin VU ce qu'est un singleton. Vivement l'observer !
+        </div>
+      </div>
+      <div class="comment">
+        <div class="avatar">K</div>
+        <div class="body">
+          <div class="h"><b>kevin.rb</b><span class="meta">il y a 5 jours</span></div>
+          Le bouton « voir à plat » sauve tout — je comprends en 3D, je copie à plat.
+        </div>
+      </div>
+      <div class="comment-form">
+        <input placeholder="Ajouter un commentaire (nom optionnel)…">
+        <a class="btn solid" href="#">Envoyer</a>
+      </div>
+      <div class="mod-note">// les commentaires passent en file de modération dans le studio</div>
+    </div>
+  </article>
+
+  <aside class="share-rail">
+    <span class="clap" style="flex-direction:column;padding:10px 6px;border-radius:12px">👏<b>340</b></span>
+    <button title="partager sur X">𝕏</button>
+    <button title="partager sur LinkedIn">in</button>
+    <button title="copier le lien">⧉</button>
+    <a href="#" title="copier en markdown">.md</a>
+  </aside>
+</div>
+
+<button class="back-top" title="retour en haut">↑</button>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Marcel Yapo</span>
+    <a href="#">RSS</a><a href="#">llms.txt</a>
+    <span style="margin-left:auto">fait avec Django + Next.js + Claude Code</span>
+  </div>
+</footer>
+
+</body>
+</html>

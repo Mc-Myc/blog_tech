@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio · Dashboard — blog_tech</title>
+<link rel="stylesheet" href="proto.css">
+<script src="proto.js"></script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="logo" href="index.html">~/blog<span class="p">_tech</span> <span style="color:var(--muted);font-size:12px">/studio</span></a>
+    <div class="nav-right">
+      <span class="meta">marcel@blog_tech</span>
+      <button class="theme-toggle" onclick="toggleTheme()" title="clair / sombre">◐</button>
+      <a class="btn" href="index.html">Voir le blog ↗</a>
+    </div>
+  </div>
+</nav>
+
+<div class="studio">
+  <aside class="sidebar">
+    <div class="sec">Contenu</div>
+    <a class="on" href="studio-dashboard.html">▦ Dashboard</a>
+    <a href="studio-editor.html">✎ Brouillons <span class="meta" style="margin-left:auto">4</span></a>
+    <a href="#">◈ Publiés <span class="meta" style="margin-left:auto">12</span></a>
+    <a href="#">≣ Séries &amp; tags</a>
+    <div class="sec">Pipeline</div>
+    <a href="#">⇣ Ingestion <span class="pill ing" style="margin-left:auto">3 new</span></a>
+    <a href="#">⌛ Backfill</a>
+    <div class="sec">Mesure</div>
+    <a href="#">∿ Stats <span class="meta" style="margin-left:auto">phase 3</span></a>
+    <a href="#">⚑ SEO <span class="meta" style="margin-left:auto">phase 4</span></a>
+  </aside>
+
+  <main class="studio-main">
+    <h1>Dashboard</h1>
+    <p class="meta">mercredi 2 juillet 2026 · tout roule ✓</p>
+
+    <div class="stats-row">
+      <div class="stat reveal d1"><div class="v">12</div><div class="l">publiés</div><div class="delta">+2 ce mois</div></div>
+      <div class="stat reveal d2"><div class="v">4</div><div class="l">brouillons</div><div class="delta" style="color:var(--hand)">1 prêt à publier</div></div>
+      <div class="stat reveal d3"><div class="v">3</div><div class="l">sessions à trier</div><div class="delta" style="color:var(--info)">via /blog-capture</div></div>
+      <div class="stat reveal d4"><div class="v">8.4k</div><div class="l">vues / 30j</div><div class="delta">+31%</div></div>
+    </div>
+
+    <div class="h2s">— File d'ingestion Claude Code</div>
+    <div class="queue">
+      <div class="qitem reveal d3">
+        <span class="score">★ 0.91</span>
+        <div>
+          <div class="t">Session du 2026-07-01 — migration Postgres qui refusait de rollback</div>
+          <div class="s">~/Sites/Django_nexjs/hub · 2h14 · 6 erreurs résolues · 4 outils</div>
+        </div>
+        <div class="act"><a class="btn solid" href="studio-editor.html">→ Brouillon</a><a class="btn" href="#">Ignorer</a></div>
+      </div>
+      <div class="qitem reveal d4">
+        <span class="score">★ 0.84</span>
+        <div>
+          <div class="t">Session du 2026-06-30 — TDD sur le parser MDX, 3 allers-retours</div>
+          <div class="s">~/Sites/Django_nexjs/blog_tech · 1h02 · 3 erreurs résolues</div>
+        </div>
+        <div class="act"><a class="btn solid" href="studio-editor.html">→ Brouillon</a><a class="btn" href="#">Ignorer</a></div>
+      </div>
+      <div class="qitem reveal d5">
+        <span class="score" style="color:var(--muted);border-color:var(--line)">★ 0.42</span>
+        <div>
+          <div class="t">Session du 2026-06-29 — renommages de fichiers (peu narratif)</div>
+          <div class="s">~/Sites/js/framework_ts · 18min</div>
+        </div>
+        <div class="act"><a class="btn" href="#">Ignorer</a></div>
+      </div>
+    </div>
+
+    <div class="h2s">— Articles récents</div>
+    <div class="table reveal d5">
+      <div class="thead"><span>Titre</span><span>Kind</span><span>Locale</span><span>Statut</span><span>Vues</span></div>
+      <div class="tr">
+        <span>Le singleton que Claude refusait d'écrire</span>
+        <span class="tag k3d">code_3d</span><span class="meta">FR</span>
+        <span class="pill pub">publié</span><span class="meta">2 341</span>
+      </div>
+      <div class="tr">
+        <span>Trois heures sur un healthcheck Docker qui mentait</span>
+        <span class="tag">standard</span><span class="meta">FR · EN</span>
+        <span class="pill pub">publié</span><span class="meta">1 872</span>
+      </div>
+      <div class="tr">
+        <span>L'observer en étoile : notifier sans coupler</span>
+        <span class="tag k3d">code_3d</span><span class="meta">FR</span>
+        <span class="pill dra">brouillon</span><span class="meta">—</span>
+      </div>
+      <div class="tr">
+        <span>TIL : les hooks PreToolUse peuvent bloquer un rm -rf</span>
+        <span class="tag til">til</span><span class="meta">FR</span>
+        <span class="pill pub">publié</span><span class="meta">964</span>
+      </div>
+      <div class="tr">
+        <span>Migration Postgres : le rollback fantôme</span>
+        <span class="tag">standard</span><span class="meta">FR</span>
+        <span class="pill ing">ingéré</span><span class="meta">—</span>
+      </div>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

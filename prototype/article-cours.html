@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mes notes NumPy : le ND array dessiné à la main — blog_tech</title>
+<link rel="stylesheet" href="proto.css">
+<script src="proto.js"></script>
+</head>
+<body>
+
+<div class="progress"></div>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="logo" href="index.html">~/blog<span class="p">_tech</span><span class="cursor"></span></a>
+    <div class="nav-links">
+      <a class="on" href="index.html">Articles</a>
+      <a href="index.html#series">Séries</a>
+      <a href="search.html">Recherche</a>
+    </div>
+    <div class="nav-right">
+      <span class="lang"><b>FR</b> / EN</span>
+      <button class="theme-toggle" onclick="toggleTheme()" title="clair / sombre">◐</button>
+      <a class="btn" href="#" title="copier l'article en markdown">⧉ .md</a>
+    </div>
+  </div>
+</nav>
+
+<header class="art-head">
+  <div class="crumb">
+    <a href="index.html">accueil</a><span class="sep">/</span>
+    <a href="index.html#series">notes de cours ml</a><span class="sep">/</span>
+    <span>numpy · ndarray</span>
+  </div>
+  <div class="row" style="display:flex;gap:10px">
+    <span class="tag til">notes de cours</span><span class="tag">numpy</span>
+    <span class="tag">python</span><span class="tag">machine-learning</span>
+    <span class="meta" style="margin-left:6px">issu de mes notes annotées du 28 fév. 2024</span>
+  </div>
+  <h1>Le ND array, dessiné à la main : mes notes NumPy au propre</h1>
+  <div class="meta">2026-07-02 · 10 min · schémas de cahier redessinés · exercice en fin d'article</div>
+</header>
+
+<div class="art-grid with-rail">
+  <aside class="toc">
+    <h5>Sommaire</h5>
+    <a class="on" href="#ndarray">Le ND array</a>
+    <a href="#shape">shape est un tuple !</a>
+    <a href="#constructeurs">Les constructeurs</a>
+    <a href="#assembler">Assembler des tableaux</a>
+    <a href="#reshape">reshape, squeeze, ravel</a>
+    <a href="#dtype">dtype : le détail qui compte</a>
+    <a href="#exo">Exercice</a>
+  </aside>
+
+  <article class="prose">
+    <p class="lead" id="ndarray">Au cœur de NumPy il y a un objet qui porte toutes les données
+      du machine learning : le tableau à N dimensions. Voici mes notes de cours,
+      schémas de cahier compris — remis au propre.</p>
+
+    <div class="concept-chip">ndarray = le conteneur de TOUTES tes données ML</div>
+
+    <p>Un ND array, c'est une liste sous stéroïdes : indexée pareil, mais compilée en C,
+      compacte en mémoire, et armée pour le calcul scientifique.</p>
+
+    <div class="schema">
+      <div style="display:flex;justify-content:center;align-items:center;gap:34px;flex-wrap:wrap">
+        <div>
+          <div class="nparr" style="grid-template-columns:repeat(3,38px)">
+            <span></span><span></span><span></span>
+          </div>
+          <span class="cap">1D — un vecteur</span>
+        </div>
+        <div>
+          <div class="nparr" style="grid-template-columns:repeat(3,38px)">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <span class="cap">2D — la matrice (ton dataset)</span>
+        </div>
+        <div>
+          <div class="nparr depth" style="grid-template-columns:repeat(3,38px)">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <span class="cap">3D — le cube (une image RGB)</span>
+        </div>
+      </div>
+      <span class="cap">et ça continue au-delà de ton imagination — mes notes, redessinées</span>
+    </div>
+
+    <p>En pratique, 90 % du temps c'est du 2D : <strong>les lignes = les exemples</strong>
+      de ton dataset, <strong>les colonnes = les variables</strong> (features + target).
+      Une image en niveaux de gris ? Un 2D array de pixels 0–255. La même en couleurs ?
+      Trois couches R, V, B empilées — ton premier 3D array.</p>
+
+    <h2 id="shape" class="has-margin">shape est un tuple !</h2>
+    <div class="note3d margin-left-note">shape est<br>un tuple !<br><span class="fleche">↓</span> immuable</div>
+    <p>L'attribut que tu liras cent fois par jour. Il donne la forme du tableau —
+      et c'est un <em>tuple</em>, ce que pas mal de développeurs oublient :</p>
+
+    <div class="schema">
+      <div style="display:flex;justify-content:center;align-items:center;gap:18px">
+        <span class="axis v">2 lignes ↓</span>
+        <div>
+          <span class="axis">3 colonnes ⟶</span>
+          <div class="nparr" style="grid-template-columns:repeat(3,38px)">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+      <span class="cap">ndim = 2 · shape = (2, 3) · size = 6</span>
+    </div>
+
+    <div class="nb-cell">
+      <div class="nb-head"><span class="idx">In</span> deux conséquences pratiques <span class="copy">⧉ copier</span></div>
+      <pre>A.shape       <span class="tok-c"># (2, 3) — un tuple : indexable…</span>
+A.shape[<span class="tok-n">0</span>]    <span class="tok-c"># 2 → le nombre de lignes</span>
+A.shape[<span class="tok-n">1</span>]    <span class="tok-c"># 3 → le nombre de colonnes</span>
+A.shape[<span class="tok-n">0</span>] = <span class="tok-n">5</span>  <span class="tok-c"># …et IMMUABLE : TypeError.</span></pre>
+    </div>
+
+    <p>À retenir aussi : <code>size</code> (le nombre total d'éléments = le produit des
+      dimensions). Et c'est à peu près tout — <code>ndim</code>, tu peux l'oublier :
+      en data-science tu vis en 2D.</p>
+
+    <h2 id="constructeurs">Les constructeurs — ceux qui servent vraiment</h2>
+
+    <table class="df-table">
+      <tr><th>constructeur</th><th>ce que ça crée</th><th>fréquence réelle</th></tr>
+      <tr><td>np.array([1, 2, 3])</td><td>depuis une liste (crochets obligatoires !)</td><td class="good">★★★</td></tr>
+      <tr><td>np.zeros((3, 2)) / np.ones((3, 4))</td><td>rempli de 0 / de 1 — shape en tuple</td><td class="good">★★★</td></tr>
+      <tr><td>np.random.randn(3, 4)</td><td>aléatoire ~ distribution normale — PAS de tuple ici</td><td class="good">★★★</td></tr>
+      <tr><td>np.linspace(0, 10, 20)</td><td>20 points répartis également — pour matplotlib</td><td>★★</td></tr>
+      <tr><td>np.arange(0, 10, 0.5)</td><td>de 0 à 10 par pas de 0,5 — pour matplotlib</td><td>★★</td></tr>
+      <tr><td>np.full((2, 3), 9)</td><td>rempli d'un nombre au choix</td><td>★</td></tr>
+      <tr><td>np.eye(7)</td><td>matrice identité</td><td>★ (rare en ML)</td></tr>
+    </table>
+
+    <div class="nb-cell">
+      <div class="nb-head"><span class="idx">In</span> le piège du débutant + la graine <span class="copy">⧉ copier</span></div>
+      <pre>np.array(<span class="tok-n">1</span>, <span class="tok-n">2</span>, <span class="tok-n">3</span>)    <span class="tok-c"># ✗ TypeError — pas comme ça</span>
+np.array([<span class="tok-n">1</span>, <span class="tok-n">2</span>, <span class="tok-n">3</span>])  <span class="tok-c"># ✓ une liste entre crochets</span>
+
+np.random.seed(<span class="tok-n">0</span>)     <span class="tok-c"># fixe l'aléatoire : reproductible</span>
+E = np.random.randn(<span class="tok-n">3</span>, <span class="tok-n">4</span>)  <span class="tok-c"># toujours le même "hasard"</span></pre>
+    </div>
+
+    <h2 id="assembler" class="has-margin">Assembler des tableaux</h2>
+    <div class="note3d rouge margin-left-note">retiens<br>concatenate,<br>oublie le reste</div>
+    <p>Coller deux tableaux, verticalement ou horizontalement. Mes schémas de cahier,
+      version au propre :</p>
+
+    <div class="schema">
+      <div style="display:flex;justify-content:center;align-items:center;flex-wrap:wrap">
+        <div class="nparr" style="grid-template-columns:repeat(2,38px)">
+          <span>0</span><span>0</span><span>0</span><span>0</span><span>0</span><span>0</span>
+        </div>
+        <span class="op-sym">+</span>
+        <div class="nparr ones" style="grid-template-columns:repeat(2,38px)">
+          <span>1</span><span>1</span><span>1</span><span>1</span><span>1</span><span>1</span>
+        </div>
+        <span class="op-sym">=</span>
+        <div class="nparr mix" style="grid-template-columns:repeat(4,38px)">
+          <span>0</span><span>0</span><span class="o">1</span><span class="o">1</span>
+          <span>0</span><span>0</span><span class="o">1</span><span class="o">1</span>
+          <span>0</span><span>0</span><span class="o">1</span><span class="o">1</span>
+        </div>
+      </div>
+      <span class="cap">np.concatenate((A, B), axis=1) — l'équivalent de hstack · shape (3,2)+(3,2) → (3,4)</span>
+    </div>
+
+    <div class="schema">
+      <div style="display:flex;justify-content:center;align-items:center;flex-wrap:wrap">
+        <div class="nparr" style="grid-template-columns:repeat(2,38px)">
+          <span>0</span><span>0</span><span>0</span><span>0</span><span>0</span><span>0</span>
+        </div>
+        <span class="op-sym">+</span>
+        <div class="nparr ones" style="grid-template-columns:repeat(2,38px)">
+          <span>1</span><span>1</span><span>1</span><span>1</span><span>1</span><span>1</span>
+        </div>
+        <span class="op-sym">=</span>
+        <div class="nparr mix" style="grid-template-columns:repeat(2,38px)">
+          <span>0</span><span>0</span><span>0</span><span>0</span><span>0</span><span>0</span>
+          <span class="o">1</span><span class="o">1</span><span class="o">1</span><span class="o">1</span><span class="o">1</span><span class="o">1</span>
+        </div>
+      </div>
+      <span class="cap">np.concatenate((A, B), axis=0) — l'équivalent de vstack · (3,2)+(3,2) → (6,2)</span>
+    </div>
+
+    <div class="verdict-box">
+      <span class="t">// mon conseil de mes propres notes</span>
+      Retiens <strong>une seule</strong> méthode : <code>concatenate</code>. Elle passe en 3D
+      (<code>axis=2</code>) là où hstack/vstack s'arrêtent, et elle te force à comprendre
+      les axes — LA notion qui perturbe débutants comme professionnels.
+    </div>
+
+    <h2 id="reshape">reshape, squeeze, ravel — la plomberie des shapes</h2>
+
+    <div class="nb-cell">
+      <div class="nb-head"><span class="idx">In</span> le trio de manipulation <span class="copy">⧉ copier</span></div>
+      <pre>K = K.reshape((<span class="tok-n">3</span>, <span class="tok-n">4</span>))   <span class="tok-c"># (2,6) → (3,4) : OK, 12 éléments des deux côtés</span>
+
+M = np.array([<span class="tok-n">1</span>, <span class="tok-n">2</span>, <span class="tok-n">3</span>])            <span class="tok-c"># shape (3,)  ← le vide qui fait planter</span>
+M = M.reshape((M.shape[<span class="tok-n">0</span>], <span class="tok-n">1</span>))    <span class="tok-c"># shape (3, 1) ← le petit 1 qui sauve</span>
+
+O = M.squeeze()   <span class="tok-c"># (3, 1) → (3,)  : fait sauter les 1</span>
+P = K.ravel()     <span class="tok-c"># (3, 4) → (12,) : aplatit tout</span></pre>
+    </div>
+
+    <p>Le <code>(3,)</code> avec son vide après la virgule, c'est le détail qui casse les
+      calculs matriciels dix cellules plus loin. <code>reshape((shape[0], 1))</code> pour
+      l'ajouter, <code>squeeze()</code> pour l'enlever (matplotlib préfère sans),
+      <code>ravel()</code> pour tout aplatir.</p>
+
+    <h2 id="dtype">dtype : le détail que beaucoup ignorent</h2>
+
+    <table class="df-table">
+      <tr><th></th><th>np.float16</th><th>np.float64</th></tr>
+      <tr><td>précision</td><td>π ≈ 3.14</td><td class="good">π ≈ 3.141592653589793</td></tr>
+      <tr><td>mémoire</td><td class="good">16 bits / nombre</td><td>64 bits / nombre</td></tr>
+      <tr><td>vitesse</td><td class="good">rapide — entraînements accélérés</td><td>plus lent</td></tr>
+    </table>
+
+    <p>Tous les constructeurs acceptent <code>dtype=</code>. Par défaut NumPy choisit bien,
+      mais quand tu veux un code performant, c'est un levier réel : moins de bits =
+      moins précis mais des modèles entraînés plus vite.</p>
+
+    <h2 id="exo">L'exercice — la matrice avec sa colonne de biais</h2>
+
+    <div class="exo">
+      <div class="exo-head">
+        <span class="t">exercice · tout ce qu'on vient de voir en 3 lignes</span>
+        Écrire <code>initialisation(m, n)</code> qui retourne une matrice aléatoire
+        <strong>(m, n+1)</strong> avec une colonne de biais (remplie de 1) tout à droite.
+        Indices : <code>randn</code>, <code>ones</code>, <code>concatenate</code>… et un shape.
+      </div>
+      <details>
+        <summary>voir la solution</summary>
+        <div class="codeblock">
+          <div class="bar"><span>●</span> solution <span class="copy">⧉ copier</span></div>
+          <pre><span class="tok-k">def</span> <span class="tok-f">initialisation</span>(m, n):
+    X = np.random.randn(m, n)
+    X = np.concatenate((X, np.ones((X.shape[<span class="tok-n">0</span>], <span class="tok-n">1</span>))), axis=<span class="tok-n">1</span>)
+    <span class="tok-k">return</span> X
+
+initialisation(<span class="tok-n">3</span>, <span class="tok-n">4</span>)  <span class="tok-c"># → shape (3, 5), dernière colonne = 1</span></pre>
+        </div>
+      </details>
+    </div>
+
+    <div class="art-foot">
+      <span class="clap">👏 <b>96</b></span>
+      <span class="meta">réactions anonymes — pas de compte requis</span>
+    </div>
+
+    <div class="pn">
+      <a href="article-notebook.html">
+        <div class="dir">← précédent</div>
+        <div class="t">Fine-tuner BERT sur du droit : le 100 % qui mentait</div>
+      </a>
+      <a class="next" href="article-archi.html">
+        <div class="dir">suivant →</div>
+        <div class="t">Un verdict de fraude ne se met pas en cache</div>
+      </a>
+    </div>
+  </article>
+
+  <aside class="share-rail">
+    <span class="clap" style="flex-direction:column;padding:10px 6px;border-radius:12px">👏<b>96</b></span>
+    <button title="partager sur X">𝕏</button>
+    <button title="partager sur LinkedIn">in</button>
+    <button title="copier le lien">⧉</button>
+    <a href="#" title="copier en markdown">.md</a>
+  </aside>
+</div>
+
+<button class="back-top" title="retour en haut">↑</button>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Marcel Yapo</span>
+    <a href="#">RSS</a><a href="#">llms.txt</a>
+    <span style="margin-left:auto">fait avec Django + Next.js + Claude Code</span>
+  </div>
+</footer>
+
+</body>
+</html>

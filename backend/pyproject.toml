@@ -1,0 +1,18 @@
+[project]
+name = "blog-tech-backend"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+  "django>=5.1,<6",
+  "djangorestframework>=3.15",
+  "drf-spectacular>=0.27",
+  "psycopg[binary]>=3.2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-django>=4.9"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.test"
+pythonpath = ["."]
+testpaths = ["tests", "src"]

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio · Éditeur — blog_tech</title>
+<link rel="stylesheet" href="proto.css">
+<script src="proto.js"></script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="logo" href="index.html">~/blog<span class="p">_tech</span> <span style="color:var(--muted);font-size:12px">/studio/editor</span></a>
+    <div class="nav-right">
+      <button class="theme-toggle" onclick="toggleTheme()" title="clair / sombre">◐</button>
+      <a class="btn" href="studio-dashboard.html">← Dashboard</a>
+    </div>
+  </div>
+</nav>
+
+<div class="ed-meta">
+  <span class="field">kind: <b>standard</b> ▾</span>
+  <span class="field">locale: <b>FR</b> ▾</span>
+  <span class="field">série: Mes galères Docker ▾</span>
+  <span class="field">tags: docker, debugging</span>
+  <span class="field" style="color:var(--info)">⇣ source : session 2026-07-01 (hub)</span>
+  <span class="meta" style="margin-left:auto">brouillon · sauvegardé il y a 12s</span>
+</div>
+
+<div class="editor">
+  <div class="ed-pane ed-src"><span class="md-fm">---
+title: Migration Postgres — le rollback fantôme
+excerpt: Une migration qui refuse de reculer, et pourquoi.
+tags: [postgres, django, debugging]
+---</span>
+
+<span class="md-h"># Le rollback fantôme</span>
+
+Hier soir, `migrate publishing 0004` passe. Ce matin,
+impossible de revenir en arrière : le rollback prétend
+réussir mais la colonne est toujours là.
+
+<span class="md-h">## Ce que la session a montré</span>
+
+Claude a commencé par lire la migration <span class="md-comp">*générée*</span> :
+
+```python
+migrations.RunSQL(
+    "ALTER TABLE article ADD COLUMN scene jsonb",
+    reverse_sql=migrations.RunSQL.noop,  # ← le voilà
+)
+```
+
+Le `noop` : le rollback "réussit" en ne faisant <span class="md-comp">**rien**</span>.
+
+<span class="md-comp">&lt;Callout style="handwritten"&gt;
+  un rollback qui ne peut pas échouer n'est pas un rollback
+&lt;/Callout&gt;</span>
+
+<span class="md-h">## La solution</span>
+
+Écrire le `reverse_sql` explicite, et ajouter un test de
+migration aller-retour dans la CI…</div>
+
+  <div class="ed-pane ed-prev">
+    <article class="prose" style="font-size:16.5px">
+      <h2 style="margin-top:0;font-size:32px">Le rollback fantôme</h2>
+      <p>Hier soir, <code>migrate publishing 0004</code> passe. Ce matin, impossible
+        de revenir en arrière : le rollback prétend réussir mais la colonne est toujours là.</p>
+      <h2 style="font-size:22px">Ce que la session a montré</h2>
+      <p>Claude a commencé par lire la migration <em>générée</em> :</p>
+      <div class="codeblock">
+        <div class="bar"><span>●</span> migration 0004 <span class="copy">⧉</span></div>
+        <pre>migrations.<span class="tok-f">RunSQL</span>(
+    <span class="tok-s">"ALTER TABLE article ADD COLUMN scene jsonb"</span>,
+    <span class="tok-n">reverse_sql</span>=migrations.RunSQL.noop,  <span class="tok-c"># ← le voilà</span>
+)</pre>
+      </div>
+      <p>Le <code>noop</code> : le rollback « réussit » en ne faisant <strong>rien</strong>.</p>
+      <div class="callout cahier"><span class="rouge pen-underline">à retenir</span> —
+        un rollback qui ne peut pas échouer n'est pas un rollback</div>
+      <h2 style="font-size:22px">La solution</h2>
+      <p>Écrire le <code>reverse_sql</code> explicite, et ajouter un test de migration
+        aller-retour dans la CI…</p>
+    </article>
+  </div>
+
+  <div class="ed-bar">
+    <span class="status">✓ MDX valide · 612 mots · ~3 min de lecture</span>
+    <div class="right">
+      <a class="btn" href="#">Prévisualiser ↗</a>
+      <a class="btn" href="#">Programmer ▾</a>
+      <a class="btn solid" href="studio-dashboard.html">Publier</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

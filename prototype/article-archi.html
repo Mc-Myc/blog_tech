@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Un verdict de fraude ne se met pas en cache — blog_tech</title>
+<link rel="stylesheet" href="proto.css">
+<script src="proto.js"></script>
+</head>
+<body>
+
+<div class="progress"></div>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="logo" href="index.html">~/blog<span class="p">_tech</span><span class="cursor"></span></a>
+    <div class="nav-links">
+      <a class="on" href="index.html">Articles</a>
+      <a href="index.html#series">Séries</a>
+      <a href="search.html">Recherche</a>
+    </div>
+    <div class="nav-right">
+      <span class="lang"><b>FR</b> / EN</span>
+      <button class="theme-toggle" onclick="toggleTheme()" title="clair / sombre">◐</button>
+      <a class="btn" href="#" title="copier l'article en markdown">⧉ .md</a>
+    </div>
+  </div>
+</nav>
+
+<header class="art-head">
+  <div class="crumb">
+    <a href="index.html">accueil</a><span class="sep">/</span>
+    <a href="index.html#series">architecture</a><span class="sep">/</span>
+    <span>fraude &amp; résilience</span>
+  </div>
+  <div class="row" style="display:flex;gap:10px">
+    <span class="tag k3d">code_3d</span><span class="tag">java</span><span class="tag">spring</span>
+    <span class="tag">resilience4j</span><span class="tag">design-patterns</span>
+    <span class="meta" style="margin-left:6px">extrait du projet NutriChain · PaymentFraudAIService.java</span>
+  </div>
+  <div class="hand3d soft hand-title" style="font-size:36px">l'architecture, au stylo…</div>
+  <h1>Un verdict de fraude ne se met pas en cache : autopsie d'un service résilient</h1>
+  <div class="meta">2026-07-02 · 8 min · 3 patterns détectés · 1 décision d'architecture (ADR-011)</div>
+</header>
+
+<div class="art-grid with-rail">
+  <aside class="toc">
+    <h5>Sommaire</h5>
+    <a class="on" href="#contexte">Le contexte</a>
+    <a href="#patterns">Les 3 patterns détectés</a>
+    <a href="#code">Le code annoté</a>
+    <a href="#uml">La logique en UML</a>
+    <a href="#adr">La décision : no-cache</a>
+    <a href="#lecon">La leçon</a>
+  </aside>
+
+  <article class="prose">
+    <p class="lead" id="contexte">Dans NutriChain, chaque paiement passe devant un modèle
+      de détection de fraude en Python. Entre le monde Java et le monde ML, il y a
+      ce service Spring — et trois décisions de design qui méritent qu'on s'y arrête.</p>
+
+    <div class="anchored reveal-scroll">
+      <div class="note3d sticker" style="right:-24px; top:-52px; font-size:29px">
+        le chemin d'un paiement
+      </div>
+      <svg class="ink-arrow" style="right:60px; top:-14px" width="90" height="60">
+        <path d="M80 4 C 60 26, 40 40, 14 50"/>
+        <polygon points="14,50 28,42 26,56"/>
+      </svg>
+    <div class="flow" style="margin-top:38px">
+      <div class="box"><b>PaymentService</b><span class="sub">Spring Boot</span></div>
+      <div class="link">──►<span class="lbl">WebClient (reactif)</span></div>
+      <div class="box"><b>PaymentFraudAIService</b><span class="sub">circuit breaker + timeout</span></div>
+      <div class="link">──►<span class="lbl">POST /fraud-detection</span></div>
+      <div class="box"><b>payment_intelligence</b><span class="sub">Python · port 8011 · ML</span></div>
+      <div class="link">╌╌►<span class="lbl">si KO</span></div>
+      <div class="box danger"><b>DENY</b><span class="sub">par défaut</span></div>
+    </div>
+    </div>
+
+    <h2 id="patterns">Les trois patterns, à la lecture du code</h2>
+
+    <p>Ce fichier de 60 lignes est une petite leçon d'architecture. Chaque pattern
+      a sa forme signature sur ce blog — les voici détectés :</p>
+
+    <div class="anchored reveal-scroll">
+      <div class="note3d rouge sticker" style="left:-36px; top:-58px; font-size:33px; transform:rotate(-5deg)">
+        3 patterns dans 60 lignes !
+      </div>
+      <svg class="ink-arrow rouge" style="left:120px; top:-16px" width="80" height="56">
+        <path d="M20 2 C 34 22, 44 34, 60 46"/>
+        <polygon points="60,46 46,42 52,32"/>
+      </svg>
+    <div class="pattern-gallery" style="margin-top:42px">
+      <div class="pcard">
+        <div class="pviz">
+          <svg width="110" height="100" viewBox="0 0 110 100">
+            <path d="M10 50 L40 50" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M40 50 L68 28" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round">
+              <animate attributeName="d" values="M40 50 L68 28;M40 50 L70 50;M40 50 L68 28" dur="3s" repeatCount="indefinite"/>
+            </path>
+            <circle cx="40" cy="50" r="4" fill="var(--accent)"/>
+            <circle cx="72" cy="50" r="4" fill="var(--accent)"/>
+            <path d="M76 50 L100 50" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h5>circuit breaker</h5>
+        <p>l'interrupteur : trop d'échecs → le circuit s'ouvre, on ne martèle plus un service mort</p>
+      </div>
+      <div class="pcard">
+        <div class="pviz">
+          <svg width="110" height="100" viewBox="0 0 110 100">
+            <rect x="14" y="12" width="82" height="76" rx="8" fill="none" stroke="var(--info)" stroke-width="2" stroke-dasharray="5 4"/>
+            <rect x="28" y="28" width="54" height="12" rx="4" fill="#6cb6ff33" stroke="var(--info)" stroke-width="1.5"/>
+            <rect x="28" y="46" width="54" height="12" rx="4" fill="var(--info)"/>
+            <rect x="28" y="64" width="54" height="12" rx="4" fill="#6cb6ff33" stroke="var(--info)" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <h5>template method</h5>
+        <p>le pochoir : la classe mère fixe le squelette, l'enfant ne remplit que doCall() et fallback()</p>
+      </div>
+      <div class="pcard">
+        <div class="pviz">
+          <svg width="110" height="100" viewBox="0 0 110 100">
+            <path d="M55 10 L90 24 L90 55 C90 74 74 86 55 92 C36 86 20 74 20 55 L20 24 Z"
+              fill="#7ec46a18" stroke="var(--ok)" stroke-width="2"/>
+            <path d="M40 52 L52 63 L74 38" fill="none" stroke="var(--ok)" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h5>deny-by-default</h5>
+        <p>le bouclier : dans le doute, on bloque — l'échec du système ne doit jamais ouvrir la porte</p>
+      </div>
+    </div>
+    </div>
+
+    <h2 id="code">Le code, annoté pattern par pattern</h2>
+
+    <div class="anchored reveal-scroll">
+      <div class="note3d sticker" style="right:-30px; top:-54px; font-size:32px; transform:rotate(2deg)">
+        le pochoir
+      </div>
+      <svg class="ink-arrow" style="right:40px; top:-8px" width="110" height="120">
+        <path d="M96 6 C 80 40, 60 76, 30 108"/>
+        <polygon points="30,108 44,100 42,114"/>
+      </svg>
+      <div class="note3d rouge sticker" style="left:-42px; bottom:64px; font-size:30px; transform:rotate(-4deg)">
+        si tout crashe :<br>DENY.
+      </div>
+      <svg class="ink-arrow rouge" style="left:56px; bottom:36px" width="120" height="64">
+        <path d="M8 10 C 40 34, 70 46, 106 50"/>
+        <polygon points="106,50 92,42 92,58"/>
+      </svg>
+    <div class="nb-cell">
+      <div class="nb-head"><span class="idx">src</span> PaymentFraudAIService.java <span class="copy">⧉ copier</span></div>
+      <pre><span class="tok-k">public class</span> <span class="tok-f">PaymentFraudAIService</span>
+        <span class="tok-k">extends</span> <span class="tok-f">AbstractPythonServiceClient</span>&lt;Req, Res&gt; <span class="pattern-flag struct">▤ template method</span>
+
+    <span class="tok-n">@Override</span>
+    <span class="tok-n">@CircuitBreaker</span>(name = SERVICE, fallback = <span class="tok-s">"callFallback"</span>) <span class="pattern-flag">⌁ circuit breaker</span>
+    <span class="tok-n">@TimeLimiter</span>(name = SERVICE)
+    <span class="tok-k">public</span> Mono&lt;FraudCheckResponse&gt; <span class="tok-f">call</span>(String userId, FraudCheckRequest request) {
+        <span class="tok-k">return</span> <span class="tok-f">super</span>.call(userId, request);
+    }
+
+    <span class="tok-n">@Override</span>
+    <span class="tok-k">protected</span> Mono&lt;Res&gt; <span class="tok-f">doCall</span>(Req request) { <span class="pattern-flag struct">▤ le "trou" du pochoir</span>
+        <span class="tok-k">return</span> webClient.post()
+                .uri(<span class="tok-s">"/fraud-detection"</span>)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(FraudCheckResponse.<span class="tok-k">class</span>);
+    }
+
+    <span class="tok-n">@Override</span>
+    <span class="tok-k">protected</span> FraudCheckResponse <span class="tok-f">fallback</span>(Throwable t) {
+        log.warn(<span class="tok-s">"Fallback payment-fraud (DENY-by-default): {}"</span>, t.getMessage());
+        <span class="tok-k">return</span> FraudCheckResponse.denyFallback(<span class="tok-k">null</span>); <span class="pattern-flag safe">🛡 deny-by-default</span>
+    }</pre>
+    </div>
+    </div>
+
+    <p>Remarque la superposition : le <em>template method</em> structure (la mère gère
+      timeout, logs, cycle de vie ; l'enfant fournit l'URI et le fallback), le
+      <em>circuit breaker</em> protège (resilience4j ouvre le circuit après N échecs),
+      et le <em>deny-by-default</em> décide de la politique quand tout a échoué.</p>
+
+    <h2 id="uml">La logique en UML manuscrit — quand le code est trop long</h2>
+    <p>Soixante lignes tiennent dans un bloc annoté. Mais un vrai template method
+      avec dix clients Python ne s'enroule pas en anneau — alors on dessine sa
+      <em>logique</em>, au cahier, en relief :</p>
+
+    <div class="scene-wrap">
+      <div class="hud" style="z-index:10">
+        <span class="tag k3d">uml v1 · template method + circuit breaker</span>
+      </div>
+      <div class="scene-stage reveal-scroll" style="height:520px">
+        <div class="floor"></div>
+
+        <!-- classe mère -->
+        <div class="uml-box" style="left:80px; top:52px">
+          <h6><span class="stereo">« abstraite » — le pochoir</span>AbstractPythonServiceClient</h6>
+          <div class="sep"></div>
+          <div class="m">+ call() <span class="note">timeout · logs · cycle de vie</span></div>
+          <div class="m"><span class="abs"># doCall()</span> <span class="note">← trou à remplir</span></div>
+          <div class="m"><span class="abs"># fallback()</span> <span class="note">← trou à remplir</span></div>
+        </div>
+
+        <!-- héritage : triangle creux UML, tracé main -->
+        <svg class="uml-inherit" style="left:190px; top:216px" width="120" height="130">
+          <path d="M60 122 C 58 90, 60 60, 62 30"/>
+          <polygon points="62,28 46,52 78,52"/>
+          <text class="lbl" x="76" y="86" transform="rotate(4 76 86)">hérite du squelette</text>
+        </svg>
+
+        <!-- classe enfant -->
+        <div class="uml-box b2" style="left:64px; top:338px">
+          <h6>PaymentFraudAIService</h6>
+          <div class="sep"></div>
+          <div class="m">doCall() → POST /fraud-detection <span class="note">port 8011</span></div>
+          <div class="m">fallback() → <span class="abs">DENY</span> <span class="note">deny-by-default</span></div>
+        </div>
+
+        <!-- annotations manuscrites 3D ancrées -->
+        <div class="hand3d sticker" style="right:66px; top:64px; font-size:30px">
+          la mère décide,
+          <small>l'enfant ne remplit<br>que les trous <span class="rouge3d">→ zéro duplication</span></small>
+        </div>
+        <svg class="ink-arrow" style="right:220px; top:120px" width="150" height="90">
+          <path d="M140 12 C 100 40, 60 60, 14 72"/>
+          <polygon points="14,72 30,64 30,80"/>
+        </svg>
+
+        <!-- la séquence de crash, sur papier isométrique -->
+        <div class="paper-iso" style="position:absolute; right:44px; bottom:64px; z-index:8; font-size:16px; --lh:22px">
+          <span class="titre pen-underline">séquence de panne</span><br>
+          call() → circuit ouvert ?<br>
+          → pas d'appel Python<br>
+          <span class="rouge">→ fallback : DENY direct</span>
+        </div>
+
+        <div class="scene-hud-bottom" style="z-index:10">
+          <span class="ctrl">⟳ replacer</span>
+          <span style="margin-left:auto">le code complet reste à plat ci-dessus — l'UML porte la logique</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="verdict-box">
+      <span class="t">// la règle des trois formats</span>
+      Code court (≤ 8 lignes) → <strong>manuscrit en forme de pattern</strong> (l'anneau
+      du singleton). Code long → <strong>bloc à plat annoté</strong> de stickers 3D.
+      Logique multi-classes → <strong>UML manuscrit 3D</strong>. Un article mixe
+      librement les trois.
+    </div>
+
+    <h2 id="adr" class="has-margin">La décision qui compte : NO-CACHE (ADR-011)</h2>
+    <div class="note3d rouge margin-left-note">un verdict de<br>fraude ne se<br>cache pas !</div>
+
+    <p>La javadoc porte la vraie décision d'architecture :</p>
+
+    <div class="callout cahier">
+      <span class="rouge pen-underline">ADR-011</span> — impossible de cacher un verdict de
+      fraude : chaque transaction doit être évaluée individuellement. Le cache, réflexe
+      de performance partout ailleurs, devient ici une faille de sécurité.
+    </div>
+
+    <div class="verdict-box">
+      <span class="t">// pourquoi c'est la bonne politique</span>
+      Un fraudeur teste d'abord une petite transaction propre, puis frappe. Un verdict
+      caché « OK » rejouerait la confiance du passé sur la transaction suivante.
+      Symétriquement, le fallback DENY assume un coût : bloquer de vrais clients quand
+      le ML est down — un arbitrage <em>business</em>, documenté, pas un accident.
+    </div>
+
+    <h2 id="lecon">La leçon</h2>
+    <p>Les patterns ne sont pas de la décoration d'entretien d'embauche : dans ces
+      60 lignes, chacun répond à un risque précis — la panne en cascade (circuit
+      breaker), la duplication entre 10 clients Python (template method), et la
+      porte laissée ouverte (deny-by-default). Le jour où tu hésites à mettre un
+      cache « pour la perf », demande-toi ce que vaut une réponse d'hier.</p>
+
+    <div class="art-foot">
+      <span class="clap">👏 <b>74</b></span>
+      <span class="meta">réactions anonymes — pas de compte requis</span>
+    </div>
+
+    <div class="pn">
+      <a href="article-cours.html">
+        <div class="dir">← précédent</div>
+        <div class="t">Le ND array, dessiné à la main</div>
+      </a>
+      <a class="next" href="article-notebook.html">
+        <div class="dir">suivant →</div>
+        <div class="t">Fine-tuner BERT sur du droit : le 100 % qui mentait</div>
+      </a>
+    </div>
+  </article>
+
+  <aside class="share-rail">
+    <span class="clap" style="flex-direction:column;padding:10px 6px;border-radius:12px">👏<b>74</b></span>
+    <button title="partager sur X">𝕏</button>
+    <button title="partager sur LinkedIn">in</button>
+    <button title="copier le lien">⧉</button>
+    <a href="#" title="copier en markdown">.md</a>
+  </aside>
+</div>
+
+<button class="back-top" title="retour en haut">↑</button>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Marcel Yapo</span>
+    <a href="#">RSS</a><a href="#">llms.txt</a>
+    <span style="margin-left:auto">fait avec Django + Next.js + Claude Code</span>
+  </div>
+</footer>
+
+</body>
+</html>

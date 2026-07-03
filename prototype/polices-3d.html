@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Choix de la police manuscrite 3D — blog_tech</title>
+<link rel="stylesheet" href="proto.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Permanent+Marker&family=Patrick+Hand&family=Architects+Daughter&family=Neucha&family=Shantell+Sans:wght@700&family=Gochi+Hand&family=Caveat:wght@700&display=swap');
+
+.specimen { max-width: 1050px; margin: 40px auto 80px; padding: 0 24px; }
+.spec-card { border: 1px solid var(--line); border-radius: 16px; margin: 26px 0;
+  padding: 30px 34px 34px; background:
+  radial-gradient(ellipse at 25% 10%, #1a212a66, var(--bg-deep) 75%);
+  position: relative; overflow: hidden; }
+.spec-card .num { position: absolute; top: 14px; right: 20px;
+  font-family: var(--mono); font-size: 26px; color: var(--accent); font-weight: 600; }
+.spec-card .fname { font-family: var(--mono); font-size: 13px; color: var(--muted);
+  margin-bottom: 22px; }
+.spec-card .fname b { color: var(--ink-strong); font-size: 15px; }
+.line3d { font-size: 30px; color: #d3deff; width: max-content; margin: 10px 0 6px;
+  text-shadow: 1px 1px 0 #5570c2, 2px 2px 0 #3f57a4, 3px 3px 0 #2b4185,
+    4px 4px 0 #1d2f63, 8px 11px 14px #000c;
+  transform: rotate(-1.5deg); }
+.line3d .kw { color: #ffb39e;
+  text-shadow: 1px 1px 0 #cc7160, 2px 2px 0 #a3492f, 3px 3px 0 #7e3520,
+    4px 4px 0 #5c2413, 8px 11px 14px #000c; }
+.annot3d { font-size: 26px; color: #ffb39e; width: max-content; margin-top: 14px;
+  transform: rotate(-2.5deg);
+  text-shadow: 1px 1px 0 #cc7160, 2px 2px 0 #a3492f, 3px 3px 0 #7e3520,
+    4px 4px 0 #5c2413, 8px 11px 14px #000c; }
+.f1 { font-family: 'Kalam', cursive; font-weight: 700; }
+.f2 { font-family: 'Permanent Marker', cursive; }
+.f3 { font-family: 'Patrick Hand', cursive; font-size: 33px; }
+.f4 { font-family: 'Architects Daughter', cursive; }
+.f5 { font-family: 'Shantell Sans', cursive; font-weight: 700; }
+.f6 { font-family: 'Neucha', cursive; font-size: 33px; }
+.f0 { font-family: 'Caveat', cursive; font-weight: 700; font-size: 34px; }
+.spec-head { text-align: center; padding: 50px 20px 10px; }
+.spec-head h1 { font-family: var(--display); font-weight: 900; font-size: 38px;
+  color: var(--ink-strong); }
+.spec-head p { color: var(--muted); margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<div class="spec-head">
+  <h1>Quelle écriture pour le manuscrit 3D ?</h1>
+  <p>La même ligne de code + la même annotation, dans 7 écritures. Dis-moi le numéro.</p>
+</div>
+
+<div class="specimen">
+
+  <div class="spec-card">
+    <span class="num">0</span>
+    <div class="fname"><b>Caveat</b> — l'actuelle (celle qui ne te plaît pas), pour comparaison</div>
+    <div class="line3d f0"><span class="kw">if</span> cls._instance <span class="kw">is</span> None: → super().__new__(cls)</div>
+    <div class="annot3d f0">retenir ça ! → une seule instance</div>
+  </div>
+
+  <div class="spec-card">
+    <span class="num">1</span>
+    <div class="fname"><b>Kalam bold</b> — écriture de cahier indienne, épaisse et très lisible</div>
+    <div class="line3d f1"><span class="kw">if</span> cls._instance <span class="kw">is</span> None: → super().__new__(cls)</div>
+    <div class="annot3d f1">retenir ça ! → une seule instance</div>
+  </div>
+
+  <div class="spec-card">
+    <span class="num">2</span>
+    <div class="fname"><b>Permanent Marker</b> — gros marqueur noir, brut, très « street »</div>
+    <div class="line3d f2"><span class="kw">if</span> cls._instance <span class="kw">is</span> None: → super().__new__(cls)</div>
+    <div class="annot3d f2">retenir ça ! → une seule instance</div>
+  </div>
+
+  <div class="spec-card">
+    <span class="num">3</span>
+    <div class="fname"><b>Patrick Hand</b> — écriture d'écolier propre et ronde, la plus « cahier »</div>
+    <div class="line3d f3"><span class="kw">if</span> cls._instance <span class="kw">is</span> None: → super().__new__(cls)</div>
+    <div class="annot3d f3">retenir ça ! → une seule instance</div>
+  </div>
+
+  <div class="spec-card">
+    <span class="num">4</span>
+    <div class="fname"><b>Architects Daughter</b> — écriture d'architecte, angulaire et technique</div>
+    <div class="line3d f4"><span class="kw">if</span> cls._instance <span class="kw">is</span> None: → super().__new__(cls)</div>
+    <div class="annot3d f4">retenir ça ! → une seule instance</div>
+  </div>
+
+  <div class="spec-card">
+    <span class="num">5</span>
+    <div class="fname"><b>Shantell Sans bold</b> — manuscrite moderne, chaleureuse, excellente lisibilité</div>
+    <div class="line3d f5"><span class="kw">if</span> cls._instance <span class="kw">is</span> None: → super().__new__(cls)</div>
+    <div class="annot3d f5">retenir ça ! → une seule instance</div>
+  </div>
+
+  <div class="spec-card">
+    <span class="num">6</span>
+    <div class="fname"><b>Neucha</b> — manuscrite droite au stylo, sobre et rapide à lire</div>
+    <div class="line3d f6"><span class="kw">if</span> cls._instance <span class="kw">is</span> None: → super().__new__(cls)</div>
+    <div class="annot3d f6">retenir ça ! → une seule instance</div>
+  </div>
+
+</div>
+
+</body>
+</html>

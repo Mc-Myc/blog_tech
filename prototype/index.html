@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>blog_tech — expériences Claude Code</title>
+<link rel="stylesheet" href="proto.css">
+<script src="proto.js"></script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="logo" href="index.html">~/blog<span class="p">_tech</span><span class="cursor"></span></a>
+    <div class="nav-links">
+      <a class="on" href="index.html">Articles</a>
+      <a href="index.html#series">Séries</a>
+      <a href="search.html">Recherche</a>
+    </div>
+    <div class="nav-right">
+      <span class="lang"><b>FR</b> / EN</span>
+      <button class="theme-toggle" onclick="toggleTheme()" title="clair / sombre">◐</button>
+      <a class="btn" href="studio-dashboard.html">Studio →</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker reveal d1">// journal d'un dev &amp; son agent</p>
+    <h1 class="reveal d2">Ce que je casse, ce que je répare, <em>avec Claude Code</em>.</h1>
+    <p class="sub reveal d3">Mes expériences réelles : les tests qui échouent, les bugs qui résistent,
+      les solutions qui marchent. Et parfois, le code se lit en trois dimensions.</p>
+    <span class="hand-note reveal d4">
+      <svg width="60" height="30" viewBox="0 0 60 30"><path d="M2 24 C 22 26, 40 18, 55 6 M55 6 l-9 1 M55 6 l-2 9"
+        stroke="#f2c94c" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      certains articles sont en 3D, essaie !
+    </span>
+  </div>
+</header>
+
+<main class="wrap feed">
+  <section>
+    <a class="card featured reveal d3" href="article-3d.html">
+      <div class="row">
+        <span class="tag k3d">code_3d</span>
+        <span class="tag">python</span>
+        <span class="tag">design-patterns</span>
+      </div>
+      <h3>Le singleton que Claude refusait d'écrire (et il avait raison)</h3>
+      <p>Une session où je demande un singleton, Claude propose une injection de dépendances,
+        et on finit par comprendre pourquoi. Visualisé en 3D : l'anneau du singleton
+        contre le graphe de l'injection.</p>
+      <div class="row" style="margin-top:14px">
+        <span class="meta">2026-06-28 · 9 min · scène 3D interactive</span>
+      </div>
+    </a>
+
+    <a class="card reveal d4" href="article.html">
+      <div class="row">
+        <span class="tag">docker</span><span class="tag">debugging</span>
+      </div>
+      <h3>Trois heures sur un healthcheck Docker qui mentait</h3>
+      <p>Le conteneur était "healthy", l'app était morte. Comment une session de
+        systematic-debugging avec Claude a fini par trouver le coupable : un curl silencieux.</p>
+      <div class="row" style="margin-top:12px"><span class="meta">2026-06-21 · 7 min</span></div>
+    </a>
+
+    <a class="card reveal d5" href="article.html">
+      <div class="row">
+        <span class="tag til">til</span><span class="tag">claude-code</span>
+      </div>
+      <h3>TIL : les hooks PreToolUse peuvent bloquer un rm -rf</h3>
+      <p>Petite découverte du jour en configurant mes settings.json.</p>
+      <div class="row" style="margin-top:12px"><span class="meta">2026-06-19 · 2 min</span></div>
+    </a>
+
+    <a class="card reveal d5" href="article.html">
+      <div class="row">
+        <span class="tag">django</span><span class="tag">ddd</span>
+      </div>
+      <h3>Hexagonal pragmatique en Django : ce que j'ai gardé, ce que j'ai jeté</h3>
+      <p>Le domaine pur sans ORM, oui. Le double mapping entité/modèle, non merci.
+        Retour d'expérience sur ce blog lui-même.</p>
+      <div class="row" style="margin-top:12px"><span class="meta">2026-06-14 · 11 min</span></div>
+    </a>
+
+    <div class="newsletter">
+      <span class="hand-arrow">pas de spam, promis ✍</span>
+      <h4>Un email quand un article sort</h4>
+      <p>Ou l'option zéro-engagement : le bon vieux flux RSS.</p>
+      <div class="nl-row">
+        <input placeholder="ton@email.dev">
+        <a class="btn solid" href="#">S'abonner</a>
+        <a class="btn" href="#">RSS ⤓</a>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:center;padding:10px 0 20px">
+      <a class="btn" href="#">↓ articles plus anciens</a>
+    </div>
+  </section>
+
+  <aside class="side" id="series">
+    <div class="block reveal d4">
+      <h4>Séries en cours</h4>
+      <a class="serie" href="article.html"><span class="n">4 articles</span><br>Mes galères Docker avec Claude</a>
+      <a class="serie" href="article-3d.html"><span class="n">2 articles · 3D</span><br>Design patterns en relief</a>
+      <a class="serie" href="article.html"><span class="n">6 articles</span><br>Construire ce blog (méta)</a>
+    </div>
+    <div class="block reveal d5">
+      <h4>Explorer</h4>
+      <div class="row" style="gap:8px; flex-wrap:wrap">
+        <span class="tag">claude-code</span><span class="tag">python</span>
+        <span class="tag">docker</span><span class="tag">django</span>
+        <span class="tag">nextjs</span><span class="tag">ddd</span>
+        <span class="tag">tdd</span><span class="tag k3d">3d</span>
+      </div>
+    </div>
+    <div class="block reveal d5">
+      <h4>Pour les agents 🤖</h4>
+      <p style="font-size:13.5px;color:var(--muted)">Ce blog est lisible en markdown brut :
+        <span style="font-family:var(--mono);color:var(--accent)">/llms.txt</span></p>
+    </div>
+  </aside>
+</main>
+
+<button class="back-top" title="retour en haut">↑</button>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Marcel Yapo</span>
+    <a href="#">RSS</a><a href="#">llms.txt</a>
+    <a href="search.html">Recherche</a>
+    <a href="studio-dashboard.html">Studio</a>
+    <span style="margin-left:auto">fait avec Django + Next.js + Claude Code</span>
+  </div>
+</footer>
+
+</body>
+</html>

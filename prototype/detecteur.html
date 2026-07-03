@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Détecteur de patterns — blog_tech</title>
+<link rel="stylesheet" href="proto.css">
+<script src="proto.js"></script>
+<style>
+.det { max-width: 1120px; margin: 0 auto; padding: 40px 24px 90px;
+  display: grid; grid-template-columns: 1fr 380px; gap: 26px; }
+.det-head { text-align: center; padding: 54px 24px 8px; }
+.det-in { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.det-in .bar { display: flex; gap: 10px; padding: 10px 16px; background: var(--surface-2);
+  border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 12px;
+  color: var(--muted); align-items: center; }
+.det-in textarea { width: 100%; height: 480px; background: var(--bg-deep); border: none;
+  outline: none; resize: none; color: #c9d1d9; font: 12.5px/1.75 var(--mono);
+  padding: 18px; }
+.hits { display: grid; gap: 14px; align-content: start; }
+.hit-card { border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px;
+  background: var(--surface); opacity: 0; translate: 0 14px; transition: .5s; }
+.hits.on .hit-card { opacity: 1; translate: 0 0; }
+.hits.on .hit-card:nth-child(2) { transition-delay: .15s; }
+.hits.on .hit-card:nth-child(3) { transition-delay: .3s; }
+.hits.on .hit-card:nth-child(4) { transition-delay: .45s; }
+.hit-card .top { display: flex; align-items: center; gap: 10px; }
+.hit-card .conf { margin-left: auto; font-family: var(--mono); font-size: 12px;
+  color: var(--ok); }
+.hit-card .lines { font-family: var(--mono); font-size: 11.5px; color: var(--muted);
+  margin-top: 6px; }
+.hit-card p { font-size: 13px; color: var(--muted); margin-top: 8px; line-height: 1.55; }
+.hit-card .go { font-family: var(--mono); font-size: 11.5px; color: var(--accent);
+  margin-top: 10px; display: inline-block; }
+.scan-note { font-family: var(--hand3d-font); font-weight: 700; font-size: 24px;
+  color: #ffe08a; text-shadow: 1px 1px 0 #a9821c, 2px 2px 0 #6e5510, 4px 6px 8px #000a;
+  transform: rotate(-2deg); text-align: center; }
+@media (max-width: 900px) { .det { grid-template-columns: 1fr; } }
+</style>
+<script>
+function scan(btn) {
+  btn.textContent = '⌁ analyse…';
+  setTimeout(() => {
+    document.getElementById('hits').classList.add('on');
+    btn.textContent = '✓ 4 patterns détectés';
+  }, 900);
+}
+</script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="logo" href="index.html">~/blog<span class="p">_tech</span><span class="cursor"></span></a>
+    <div class="nav-links">
+      <a href="index.html">Articles</a>
+      <a href="atlas.html">Atlas</a>
+      <a class="on" href="detecteur.html">Détecteur</a>
+      <a href="search.html">Recherche</a>
+    </div>
+    <div class="nav-right">
+      <span class="lang"><b>FR</b> / EN</span>
+      <button class="theme-toggle" onclick="toggleTheme()" title="clair / sombre">◐</button>
+      <a class="btn" href="editeur.html">Éditeur →</a>
+    </div>
+  </div>
+</nav>
+
+<header class="det-head">
+  <div class="title3d" style="font-size:48px; margin:0 auto">
+    <span class="mini">colle ton code, il dit ses formes</span>Le Détecteur
+  </div>
+</header>
+
+<main class="det">
+  <div>
+    <div class="det-in">
+      <div class="bar"><span>●</span> PaymentFraudAIService.java · 58 lignes · java
+        <button class="btn solid" style="margin-left:auto" onclick="scan(this)">⌁ Détecter les patterns</button>
+      </div>
+      <textarea spellcheck="false">@Service
+public class PaymentFraudAIService
+        extends AbstractPythonServiceClient<FraudCheckRequest, FraudCheckResponse> {
+
+    private static final String SERVICE = "payment-fraud";
+
+    public PaymentFraudAIService(
+            @Qualifier("paymentFraudWebClient") WebClient webClient,
+            AIServicesProperties properties) {
+        super(webClient, SERVICE,
+                Duration.ofMillis(properties.resolveTimeoutMs("payment-fraud")));
+    }
+
+    @Override
+    @CircuitBreaker(name = SERVICE, fallbackMethod = "callFallback")
+    @TimeLimiter(name = SERVICE)
+    public Mono<FraudCheckResponse> call(String userId, FraudCheckRequest request) {
+        return super.call(userId, request);
+    }
+
+    @Override
+    protected Mono<FraudCheckResponse> doCall(FraudCheckRequest request) {
+        return webClient.post()
+                .uri("/fraud-detection")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(FraudCheckResponse.class);
+    }
+
+    @Override
+    protected FraudCheckResponse fallback(Throwable t) {
+        log.warn("Fallback payment-fraud (DENY-by-default): {}", t.getMessage());
+        return FraudCheckResponse.denyFallback(null);
+    }
+}</textarea>
+    </div>
+  </div>
+
+  <div class="hits" id="hits">
+    <div class="scan-note">ce que le code avoue…</div>
+
+    <div class="hit-card">
+      <div class="top"><span class="pattern-flag struct">▤ patron de méthode</span>
+        <span class="conf">confiance 0.96</span></div>
+      <div class="lines">lignes 2-3, 22, 31 · extends + @Override sur méthodes protégées</div>
+      <p>La classe mère fixe le squelette (<code>call</code>), l'enfant ne remplit que
+        <code>doCall()</code> et <code>fallback()</code>. Forme : le pochoir.</p>
+      <a class="go" href="atlas.html">→ fiche dans l'Atlas</a>
+    </div>
+
+    <div class="hit-card">
+      <div class="top"><span class="pattern-flag">⌁ circuit breaker</span>
+        <span class="conf">confiance 0.99</span></div>
+      <div class="lines">ligne 15 · @CircuitBreaker(resilience4j) + fallbackMethod</div>
+      <p>Après N échecs le circuit s'ouvre : on ne martèle plus un service mort.
+        Forme : l'interrupteur.</p>
+      <a class="go" href="article-archi.html">→ vu en action dans l'article fraude</a>
+    </div>
+
+    <div class="hit-card">
+      <div class="top"><span class="pattern-flag safe">🛡 deny-by-default</span>
+        <span class="conf">confiance 0.91</span></div>
+      <div class="lines">lignes 31-34 · fallback retourne denyFallback(…)</div>
+      <p>Quand tout crashe, la porte reste fermée. Politique de sécurité, pas un
+        pattern GoF — le détecteur connaît aussi ces formes-là. Forme : le bouclier.</p>
+      <a class="go" href="article-archi.html">→ pourquoi c'est la bonne politique</a>
+    </div>
+
+    <div class="hit-card">
+      <div class="top"><span class="pattern-flag struct">⇣ injection de dépendances</span>
+        <span class="conf">confiance 0.88</span></div>
+      <div class="lines">lignes 7-9 · constructeur + @Qualifier, aucune création interne</div>
+      <p>Les dépendances descendent par le constructeur — l'objet ne fabrique rien
+        lui-même. Forme : l'entonnoir.</p>
+      <a class="go" href="atlas.html">→ fiche dans l'Atlas (architecture)</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Marcel Yapo</span>
+    <a href="atlas.html">Atlas</a><a href="editeur.html">Éditeur</a>
+    <span style="margin-left:auto">v1 : règles AST · v2 : modèle entraîné sur l'Atlas</span>
+  </div>
+</footer>
+
+</body>
+</html>
