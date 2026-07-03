@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     "rest_framework",
     "drf_spectacular",
+    "src.publishing.apps.PublishingConfig",
 ]
 
 MIDDLEWARE = [
