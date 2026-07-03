@@ -6,7 +6,7 @@
 
 **Architecture:** Hexagonal pragmatique — domaine Python pur (invariants, zéro import Django), use cases + ports, infrastructure ORM/Postgres qui implémente les ports, interface DRF read-only publique + admin comme éditeur v1. Spec de référence : `docs/superpowers/specs/2026-07-02-blog-tech-design.md`.
 
-**Tech Stack:** Python 3.12, Django 5.x, DRF, drf-spectacular, Postgres 16 (docker), pytest + pytest-django.
+**Tech Stack:** Python 3.12+, Django 5.x, DRF, drf-spectacular, Postgres 16 **natif — SANS Docker** (Postgres.app/Homebrew, port 5432), pytest + pytest-django.
 
 ## Global Constraints
 
@@ -15,7 +15,7 @@
 - Le domaine (`backend/src/*/domain/`) n'importe JAMAIS Django.
 - API : préfixe `/api/v1/`, lecture publique sans auth, pagination 10.
 - Locale : `fr` par défaut, valeurs autorisées `fr` | `en` ; slug unique PAR locale.
-- Postgres de dev sur le port hôte **5433** (évite les conflits locaux).
+- **SANS Docker** : Postgres natif local (Postgres.app), port **5432**, base `blog_tech`, utilisateur = utilisateur macOS courant sans mot de passe ; settings lus via env (`DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`) avec ces défauts.
 - Tests : `pytest` depuis `backend/` ; les tests domaine ne touchent pas la DB.
 - Commits : préfixes `feat:`/`test:`/`chore:`, un commit par tâche minimum.
 - `reading_time` = `max(1, round(mots / 200))`.
@@ -154,12 +154,15 @@ TEMPLATES = [{
 
 DATABASES = {"default": {
     "ENGINE": "django.db.backends.postgresql",
-    "NAME": "blog_tech",
-    "USER": "blog",
-    "PASSWORD": "blog",
-    "HOST": "127.0.0.1",
-    "PORT": "5433",
+    "NAME": os.environ.get("DB_NAME", "blog_tech"),
+    "USER": os.environ.get("DB_USER", getpass.getuser()),
+    "PASSWORD": os.environ.get("DB_PASSWORD", ""),
+    "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
+    "PORT": os.environ.get("DB_PORT", "5432"),
 }}
+```
+(avec `import os` et `import getpass` en tête de `base.py`)
+```python
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LANGUAGE_CODE = "fr"

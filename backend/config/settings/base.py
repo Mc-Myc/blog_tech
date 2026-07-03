@@ -1,3 +1,5 @@
+import os
+import getpass
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -43,11 +45,11 @@ TEMPLATES = [{
 
 DATABASES = {"default": {
     "ENGINE": "django.db.backends.postgresql",
-    "NAME": "blog_tech",
-    "USER": "blog",
-    "PASSWORD": "blog",
-    "HOST": "127.0.0.1",
-    "PORT": "5433",
+    "NAME": os.environ.get("DB_NAME", "blog_tech"),
+    "USER": os.environ.get("DB_USER", getpass.getuser()),
+    "PASSWORD": os.environ.get("DB_PASSWORD", ""),
+    "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
+    "PORT": os.environ.get("DB_PORT", "5432"),
 }}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

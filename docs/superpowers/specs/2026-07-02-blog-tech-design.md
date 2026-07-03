@@ -353,5 +353,7 @@ Roadmap détaillée et exigences transverses : `docs/patterns/outils.md`
   tests d'API DRF sur les endpoints publics.
 - **Frontend** : Vitest + Testing Library pour les composants ; un smoke
   Playwright par page ; Steiger (frontières FSD) en CI.
-- **Déploiement** : `docker-compose` (Postgres + Django + Next.js), cible VPS.
+- **Déploiement** : **sans Docker** (décision du 2026-07-03). Dev : Postgres natif
+  (Postgres.app/Homebrew, port 5432). Prod : VPS classique (gunicorn + nginx +
+  Postgres managé) ou PaaS — à trancher au moment du déploiement.
 - **Repo** : monorepo `backend/` + `frontend/` dans `blog_tech `.
