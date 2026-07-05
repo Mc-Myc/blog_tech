@@ -1,59 +1,61 @@
-# blog_tech — Scaffold Claude Code
+# blog_tech — Scaffold Claude Code (v4.1)
 
-Scaffold issu de `scaffold-phases-1-to-4-addon` (phases 1 à 4). Voir
-`.claude/core/` pour l'architecture (patterns, ADR) et `.claude/packs/` pour les
-packs evals et research.
+Scaffold v4.1 (add-on cumulatif v3+v4+v4.1 mergé le 2026-07-05). Voir
+`.claude/core/` pour l'architecture (patterns, ADRs) et `.claude/packs/` pour
+les packs métier. Projet : blog Django + Next.js — spec dans
+`docs/superpowers/specs/`, plan en cours dans `docs/superpowers/plans/`.
 
-## Slash commands custom
+## Slash commands
 
-- `/spec [titre]` — Wizard spec-first, produit spec + prompt plan dans `core/specs/`
-- `/eval <cible>` — Eval suite (méthode Husain) sur un sub-agent, skill, ou sortie
-- `/lint <chemin>` — Health-check d'un knowledge store (cohérence, doublons, liens)
+- `/spec [titre]` — Wizard spec-first v2 (routing pré-calculé, leçons, dataset généré)
+- `/run-spec <id> [--batch] [--checkpoint N]` — Orchestrateur d'exécution (ADR-005)
+- `/eval <cible>` — Eval suite (méthode Husain) + journalisation auto
+- `/lint <chemin>` — Health-check d'un knowledge store + journalisation auto
+- `/compact <store>` — Compaction d'un knowledge store
+- `/debrief` — Consolidation de fin de session (3 questions)
 
-## Sous-agents disponibles
+## Sous-agents
 
-- `@evaluator` — Juge une sortie contre des critères, verdict binaire + critique
+- `@architect` — Conception, ADRs (Opus 4.8)
+- `@auditor` — Audits avec preuves fichier:ligne (Opus 4.8)
+- `@evaluator` — Juge une sortie contre des critères, verdict binaire (Sonnet 5, escalade auto)
+- `@critic` — Red-team sans critères prédéfinis (Opus 4.8)
 
 ## Skills
 
-- `evaluator-optimizer` — Boucle générer→évaluer→raffiner (pattern Anthropic)
-- `compile-wiki` — Compilation `packs/research/raw/` → `wiki/` (pattern Karpathy)
-- `health-check` — Diagnostic santé d'un knowledge store (utilisé par `/lint`)
+evaluator-optimizer · compile-wiki · health-check · knowledge-store ·
+reasoning-discipline (CoT partagé) · voting (Signal B) · pre-mortem (enjeu
+critique) · distill-lessons · model-dispatch (ADR-006)
 
-## Routing modèle (ADR-004)
+## Routing modèle (ADR-006)
 
-Trois tiers, arbitrage sur **complexité × tolérance à la latence × coût** :
+| Niveau | Modèle | Expert de |
+|---|---|---|
+| mecanique | Haiku 4.5 | volume, mécanique : extraction, formatage, checks |
+| courant | Sonnet 5 | dev courant, interactif, wizards, gates @evaluator |
+| jugement | Opus 4.8 | conception, jugement, @architect/@auditor/@critic — défaut |
+| escalade | Fable 5 | signaux A-E uniquement, jamais par défaut, jamais interactif |
 
-- **Volume** — modèles locaux (Mistral / Qwen / DeepSeek) : tâches courantes, volumineuses, pré-traitement, classification.
-- **Workhorse** — Claude Opus 4.8 : défaut raisonnable pour tâches complexes.
-- **Escalade** — Claude Fable 5 (classe Mythos publique) : escalade *consciente*, jamais par défaut.
-
-Règle de décision :
-
-1. Tâche interactive / sensible au temps → **JAMAIS Escalade**, quelle que soit la complexité. Volume si simple, Workhorse si complexe.
-2. Async + volumineuse + faible enjeu de justesse → **Volume** (local).
-3. Complexe + async + enjeu de justesse élevé → **Workhorse (Opus 4.8)** par défaut. Escalade vers Fable 5 seulement si Opus 4.8 a échoué le critère d'acceptation OU si l'enjeu justifie explicitement le surcoût/latence.
-4. Dans le doute → **Workhorse (Opus 4.8)**.
-
-> Pour la grille fine des cas d'escalade : `.claude/core/architecture/patterns/mythos-triggers.md`.
-> Mythos Preview / Mythos 5 (accès Glasswing restreint) sont hors périmètre tant que l'accès n'est pas en place.
+> Sources de vérité : `core/config/models.yaml` (opérationnel), ADR-006 (politique),
+> `mythos-triggers.md` (signaux d'escalade). Ne pas dupliquer la règle ici.
 
 ## Structure
 
 ```
 .claude/
-  agents/      → evaluator
-  commands/    → spec, eval, lint
-  skills/      → evaluator-optimizer, compile-wiki, health-check
-  templates/   → _spec-template.md
-  core/        → architecture (patterns, decisions/ADR), specs
-  packs/       → evals (datasets, judges, results, error-analysis), research (raw, wiki)
+  agents/      → architect, auditor, evaluator, critic
+  commands/    → spec, run-spec, eval, lint, compact, debrief
+  skills/      → 9 skills (voir .claude/skills/README.md)
+  core/        → architecture (patterns, 5 ADRs), config/models.yaml,
+                 memory (lessons-learned, recall-misses, escalations), specs
+  packs/       → evals, research, produit, marketing, design, data-ia, 3d,
+                 providers-externes.disabled
 ```
 
-## À faire (côté humain)
+## À faire (côté humain — v4.1)
 
-1. Tester `/spec` dans une session pour valider le wizard.
-2. Calibrer avec `/eval auditor` sur `packs/evals/datasets/auditor-quality-v1.md`.
-3. Tenir `core/memory/recall-misses.md` : à 3 entrées, rouvrir ADR-002.
-4. Routing (ADR-004 + mythos-triggers) : journaliser les escalades dans `lessons-learned.md` pendant 2-3 semaines.
-5. Au bout de 10-15 escalades effectives, faire un bilan ; si un domaine ne se justifie jamais, créer ADR-005 qui supersede partiellement ADR-004.
+1. Premier `/run-spec` en supervised sur une petite spec réelle.
+2. Premier batch avec `--checkpoint 2` le temps de prendre confiance.
+3. Désactiver (`.disabled`) les packs métier qui ne servent pas tout de suite.
+4. Calibration : journal des escalades → bilan à 10-15 entrées → réviser ADR-006.
+5. `distill-lessons` : premier run quand `lessons-learned.md` atteint ~15 entrées.
