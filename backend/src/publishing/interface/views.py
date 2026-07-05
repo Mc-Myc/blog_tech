@@ -17,7 +17,7 @@ class ArticleList(generics.ListAPIView):
     serializer_class = ArticleListSerializer
 
     def get_queryset(self):
-        qs = _published(self.request.query_params.get("locale", "fr"))
+        qs = _published(self.request.query_params.get("locale") or "fr")
         if kind := self.request.query_params.get("kind"):
             qs = qs.filter(kind=kind)
         if tag := self.request.query_params.get("tag"):
@@ -30,7 +30,7 @@ class ArticleDetail(generics.RetrieveAPIView):
     lookup_field = "slug"
 
     def get_queryset(self):
-        return _published(self.request.query_params.get("locale", "fr"))
+        return _published(self.request.query_params.get("locale") or "fr")
 
 
 class SeriesList(generics.ListAPIView):
@@ -43,5 +43,5 @@ class SearchList(generics.ListAPIView):
 
     def get_queryset(self):
         q = self.request.query_params.get("q", "")
-        locale = self.request.query_params.get("locale", "fr")
+        locale = self.request.query_params.get("locale") or "fr"
         return search_published(q, locale) if q else ArticleModel.objects.none()

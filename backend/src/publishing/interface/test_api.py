@@ -50,3 +50,14 @@ def test_detail_404_pour_brouillon(client, articles):
 def test_recherche(client, articles):
     data = client.get("/api/v1/search/?q=singleton").json()
     assert data["count"] == 1
+
+
+def test_detail_locale_vide_ne_500_pas(client, articles):
+    # même slug publié en deux locales
+    ArticleModel.objects.create(
+        slug="singleton", locale="en", kind="standard", title="The singleton",
+        excerpt="", body_mdx="x", status="published",
+        published_at=NOW)
+    r = client.get("/api/v1/articles/singleton/?locale=")
+    assert r.status_code == 200          # défaut fr, pas de 500
+    assert r.json()["title"] == "Le singleton"
