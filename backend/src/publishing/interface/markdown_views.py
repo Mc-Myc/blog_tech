@@ -14,8 +14,9 @@ def llms_txt(request):
 
 
 def article_md(request, slug):
+    locale = request.GET.get("locale") or "fr"
     try:
-        a = ArticleModel.objects.get(slug=slug, status="published")
+        a = ArticleModel.objects.get(slug=slug, locale=locale, status="published")
     except ArticleModel.DoesNotExist:
         raise Http404
     front = (f"---\ntitle: {a.title}\nlocale: {a.locale}\nkind: {a.kind}\n"

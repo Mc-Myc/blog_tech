@@ -37,6 +37,18 @@ def test_article_md_404_si_brouillon():
     assert Client().get("/api/v1/articles/d.md").status_code == 404
 
 
+def test_article_md_deux_locales_meme_slug(publie):
+    ArticleModel.objects.create(
+        slug="singleton", locale="en", kind="standard", title="The singleton",
+        excerpt="Summary.", body_mdx="# Title", status="published",
+        published_at=NOW)
+    r = Client().get("/api/v1/articles/singleton.md")
+    assert r.status_code == 200
+    assert "title: Le singleton" in r.content.decode()          # fr par défaut
+    r_en = Client().get("/api/v1/articles/singleton.md?locale=en")
+    assert "title: The singleton" in r_en.content.decode()
+
+
 def test_rss(publie):
     r = Client().get("/api/v1/rss.xml")
     assert r.status_code == 200
