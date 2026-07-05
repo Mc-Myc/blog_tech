@@ -9,3 +9,8 @@ staticfiles/
 .superpowers/
 .DS_Store
 *.egg-info/
+
+# add-ons scaffold (sources locales, non versionnées)
+scaffold-*-addon/
+scaffold-phases-*/
+model_juridique.ipynb
