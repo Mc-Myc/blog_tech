@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_spectacular",
     "src.publishing.apps.PublishingConfig",
+    "src.media_library.apps.MediaLibraryConfig",
 ]
 
 MIDDLEWARE = [
