@@ -1,0 +1,7 @@
+.tag {
+  font-family: var(--font-mono); font-size: 11.5px; padding: 3px 9px;
+  border: 1px solid var(--line); border-radius: 99px; color: var(--muted);
+  display: inline-block;
+}
+.k3d { border-color: var(--accent); color: var(--accent); }
+.til { border-color: var(--info); color: var(--info); }
