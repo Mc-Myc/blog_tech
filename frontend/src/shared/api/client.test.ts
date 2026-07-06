@@ -26,4 +26,9 @@ describe("shared/api", () => {
       new Response(JSON.stringify({ wrong: true }), { status: 200 })));
     await expect(apiGet("/x/", Item)).rejects.toBeInstanceOf(ApiError);
   });
+
+  it("lève ApiError si le corps 2xx n'est pas du JSON", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response("<html>oops</html>", { status: 200 })));
+    await expect(apiGet("/x/", Item)).rejects.toBeInstanceOf(ApiError);
+  });
 });

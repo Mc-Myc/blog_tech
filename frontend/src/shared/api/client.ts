@@ -17,7 +17,12 @@ export async function apiGet<T>(path: string, schema: ZodType<T>): Promise<T> {
     throw new ApiError(`réseau: ${(e as Error).message}`);
   }
   if (!res.ok) throw new ApiError(`HTTP ${res.status} sur ${path}`, res.status);
-  const json = await res.json();
+  let json: unknown;
+  try {
+    json = await res.json();
+  } catch {
+    throw new ApiError(`réponse non-JSON sur ${path}`);
+  }
   const parsed = schema.safeParse(json);
   if (!parsed.success) throw new ApiError(`schéma invalide sur ${path}: ${parsed.error.message}`);
   return parsed.data;
