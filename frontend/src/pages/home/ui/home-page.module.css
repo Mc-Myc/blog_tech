@@ -1,0 +1,8 @@
+.hero { padding: 72px 0 40px; }
+.kicker { font-family: var(--font-mono); font-size: 12px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--accent); }
+.hero h1 { font-family: var(--font-display); font-weight: 900;
+  font-size: clamp(40px, 6vw, 64px); line-height: 1.02; color: var(--ink-strong);
+  max-width: 14ch; margin-top: 14px; }
+.hero p { margin-top: 18px; max-width: 52ch; color: var(--muted); font-size: 17px; }
+.feed { padding: 20px 0 90px; }

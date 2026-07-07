@@ -12,7 +12,7 @@ export async function apiGet<T>(path: string, schema: ZodType<T>): Promise<T> {
   const url = `${apiBase()}${path}`;
   let res: Response;
   try {
-    res = await fetch(url, { cache: "no-store" });
+    res = await fetch(url);
   } catch (e) {
     throw new ApiError(`réseau: ${(e as Error).message}`);
   }

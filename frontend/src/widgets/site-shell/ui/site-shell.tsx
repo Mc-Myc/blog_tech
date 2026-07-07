@@ -29,7 +29,7 @@ export function SiteShell(
         </div>
       </nav>
       <main>{children}</main>
-      <footer>
+      <footer className={styles.footer}>
         <div className={styles.foot}>
           <span>© 2026 Marcel Yapo</span>
           <a href="/rss.xml">RSS</a>
