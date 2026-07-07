@@ -14,7 +14,8 @@ export function ReadingProgress() {
     return () => document.removeEventListener("scroll", onScroll);
   }, []);
   return (
-    <div style={{ position: "fixed", top: 0, left: 0, height: 3, width: `${pct}%`,
-      background: "var(--accent)", zIndex: 60, transition: "width .1s" }} />
+    <div style={{ position: "fixed", top: 0, left: 0, right: 0, height: 3, zIndex: 60,
+      transform: `scaleX(${pct / 100})`, transformOrigin: "0 50%",
+      background: "var(--accent)" }} />
   );
 }
