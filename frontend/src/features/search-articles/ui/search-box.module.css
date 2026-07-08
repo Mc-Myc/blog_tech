@@ -1,0 +1,7 @@
+.box { display: flex; align-items: center; gap: 12px; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px;
+  font-family: var(--font-mono); font-size: 16px; transition: .2s; }
+.box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+.box input { flex: 1; background: none; border: none; outline: none;
+  color: var(--ink-strong); font: inherit; }
+.prompt { color: var(--accent); }

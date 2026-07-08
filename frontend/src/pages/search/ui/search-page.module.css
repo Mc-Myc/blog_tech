@@ -1,0 +1,5 @@
+.hero { padding: 60px 0 20px; max-width: 760px; margin: 0 auto; }
+.hero h1 { font-family: var(--font-display); font-weight: 900; font-size: 40px;
+  color: var(--ink-strong); margin-bottom: 22px; }
+.meta { font-family: var(--font-mono); font-size: 13px; color: var(--muted); margin: 18px 0 4px; }
+.results { max-width: 760px; margin: 0 auto; padding-bottom: 90px; }
