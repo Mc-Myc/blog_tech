@@ -1,3 +1,5 @@
+"use client";
+
 import type { Locale } from "@/shared/config";
 import { t } from "@/shared/i18n";
 import styles from "./search-box.module.css";
