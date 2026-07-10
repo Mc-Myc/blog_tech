@@ -6,3 +6,5 @@
   max-width: 14ch; margin-top: 14px; }
 .hero p { margin-top: 18px; max-width: 52ch; color: var(--muted); font-size: 17px; }
 .feed { padding: 20px 0 90px; }
+.empty { color: var(--muted); font-family: var(--font-mono); font-size: 14px;
+  padding: 40px 0; border-top: 1px solid var(--line); }

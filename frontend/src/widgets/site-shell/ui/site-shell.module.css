@@ -13,3 +13,9 @@
 .footer { border-top: 1px solid var(--line); padding: 34px 0 44px;
   color: var(--muted); font-family: var(--font-mono); font-size: 12.5px; }
 .foot { max-width: var(--max); margin: 0 auto; padding: 0 24px; display: flex; gap: 24px; flex-wrap: wrap; }
+
+@media (max-width: 640px) {
+  .inner { gap: 14px; padding: 0 16px; }
+  .links { gap: 14px; font-size: 13px; }
+  .logo { font-size: 14px; }
+}

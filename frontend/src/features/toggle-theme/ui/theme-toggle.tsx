@@ -17,7 +17,8 @@ export function ThemeToggle() {
   return (
     <button onClick={toggle} title="clair / sombre" aria-label="basculer le thème"
       style={{ cursor: "pointer", border: "1px solid var(--line)", borderRadius: 99,
-        width: 34, height: 34, background: "none", color: "var(--ink)" }}>
+        width: "var(--tap)", height: "var(--tap)", background: "none", color: "var(--ink)",
+        fontSize: 16, lineHeight: 1 }}>
       ◐
     </button>
   );

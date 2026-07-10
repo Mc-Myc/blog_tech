@@ -12,7 +12,9 @@ export function HomePage({ locale, articles }: { locale: Locale; articles: Artic
           les solutions qui marchent.</p>
       </header>
       <section className={styles.feed} id="series">
-        {articles.map((a) => <ArticleCard key={a.slug} article={a} locale={locale} />)}
+        {articles.length === 0
+          ? <p className={styles.empty}>Aucun article pour l'instant — reviens bientôt.</p>
+          : articles.map((a) => <ArticleCard key={a.slug} article={a} locale={locale} />)}
       </section>
     </div>
   );
