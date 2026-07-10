@@ -14,3 +14,6 @@ staticfiles/
 scaffold-*-addon/
 scaffold-phases-*/
 model_juridique.ipynb
+.claude/scheduled_tasks.lock
+.claude/settings.local.json
+frontend/tsconfig.tsbuildinfo
