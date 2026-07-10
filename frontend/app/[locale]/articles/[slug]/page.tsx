@@ -27,8 +27,15 @@ export async function generateMetadata(
   if (!isLocale(locale)) return {};
   try {
     const a = await fetchArticle(slug, locale);
-    return { title: a.title, description: a.excerpt,
-      openGraph: { title: a.title, description: a.excerpt, type: "article" } };
+    return {
+      title: a.title,
+      description: a.excerpt,
+      alternates: {
+        canonical: `/${locale}/articles/${slug}`,
+        languages: { fr: `/fr/articles/${slug}`, en: `/en/articles/${slug}` },
+      },
+      openGraph: { title: a.title, description: a.excerpt, type: "article" },
+    };
   } catch {
     return {};
   }

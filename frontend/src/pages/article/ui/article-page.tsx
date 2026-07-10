@@ -3,6 +3,7 @@ import type { Locale } from "@/shared/config";
 import { t } from "@/shared/i18n";
 import { ArticleReader } from "@/widgets/article-reader";
 import type { ArticleDetail } from "@/entities/article";
+import { ShareBar } from "@/features/share-article";
 import styles from "./article-page.module.css";
 
 export function ArticlePage({ article, locale }: { article: ArticleDetail; locale: Locale }) {
@@ -11,6 +12,7 @@ export function ArticlePage({ article, locale }: { article: ArticleDetail; local
     <div className="wrap">
       <ArticleReader article={article} locale={locale} />
       <div className={styles.foot}>
+        <ShareBar title={article.title} />
         <Link className={styles.back} href={`/${locale}`}>{tr.backHome}</Link>
       </div>
     </div>
