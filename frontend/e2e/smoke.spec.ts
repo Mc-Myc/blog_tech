@@ -34,3 +34,15 @@ test("la nav reste utilisable en mobile (375px)", async ({ page }) => {
   await expect(page.getByRole("link", { name: /blog/i })).toBeVisible();
   await expect(page.getByRole("link", { name: /Recherche|Search/ })).toBeVisible();
 });
+
+test("/sitemap.xml est servi (pas avalé par le middleware)", async ({ page }) => {
+  const res = await page.goto("/sitemap.xml");
+  expect(res?.status()).toBe(200);
+  expect(await page.content()).toContain("urlset");
+});
+
+test("/robots.txt est servi et pointe le sitemap", async ({ page }) => {
+  const res = await page.goto("/robots.txt");
+  expect(res?.status()).toBe(200);
+  expect(await page.content()).toContain("Sitemap");
+});

@@ -8,6 +8,7 @@ const mono = IBM_Plex_Mono({ subsets: ["latin"], variable: "--font-mono", weight
 const ui = IBM_Plex_Sans({ subsets: ["latin"], variable: "--font-ui", weight: ["400", "500", "600"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.SITE_URL ?? "http://localhost:3000"),
   title: "blog_tech — expériences Claude Code",
   description: "Tests, problèmes, solutions — parfois en 3D.",
 };
