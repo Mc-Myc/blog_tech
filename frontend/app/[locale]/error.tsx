@@ -1,13 +1,15 @@
 "use client";
 
-import { DICTS } from "@/shared/i18n/dictionaries";
+import { usePathname } from "next/navigation";
+import { DEFAULT_LOCALE, isLocale } from "@/shared/config";
+import { t } from "@/shared/i18n";
 
-// Server/Client Components at the [locale] level (not-found/error/loading) don't reliably
-// receive the `locale` route param, so this stays French-only (DICTS.fr) for now.
-// Per-locale rendering here would need client-side locale detection — out of scope.
-const tr = DICTS.fr;
-
+// Client Component (can't read the `x-locale` header via next/headers), so the locale is
+// derived from the first path segment instead — set by middleware.ts (/fr/..., /en/...).
 export default function Error({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
+  const pathname = usePathname();
+  const segment = pathname?.split("/")[1] ?? "";
+  const tr = t(isLocale(segment) ? segment : DEFAULT_LOCALE);
   return (
     <div className="wrap" style={{ padding: "80px 24px", textAlign: "center" }}>
       <h1 style={{ fontFamily: "var(--font-display)", fontSize: 32, color: "var(--ink-strong)" }}>

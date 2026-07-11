@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { DICTS } from "@/shared/i18n/dictionaries";
+import { t } from "@/shared/i18n";
+import { localeFromHeaders } from "@/shared/i18n/server-locale";
 
 // Server Components at the [locale] level (not-found/error/loading) don't reliably
-// receive the `locale` route param, so this stays French-only (DICTS.fr) for now.
-// Per-locale rendering here would need client-side locale detection — out of scope.
-const tr = DICTS.fr;
-
-export default function NotFound() {
+// receive the `locale` route param, so the locale is read from the `x-locale` header
+// forwarded by middleware.ts (see shared/i18n/server-locale.ts).
+export default async function NotFound() {
+  const tr = t(await localeFromHeaders());
   return (
     <div className="wrap" style={{ padding: "80px 24px", textAlign: "center" }}>
       <h1 style={{ fontFamily: "var(--font-display)", fontSize: 32, color: "var(--ink-strong)" }}>

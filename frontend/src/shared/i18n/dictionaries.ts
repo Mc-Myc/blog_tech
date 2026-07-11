@@ -16,6 +16,7 @@ export interface Dict {
   errorBody: string;
   errorRetry: string;
   loadingLabel: string;
+  footerTagline: string;
 }
 
 const fr: Dict = {
@@ -38,6 +39,7 @@ const fr: Dict = {
   errorBody: "Le contenu n'a pas pu être chargé. Le serveur est peut-être momentanément indisponible.",
   errorRetry: "↻ Réessayer",
   loadingLabel: "Chargement…",
+  footerTagline: "fait avec Django + Next.js + Claude Code",
 };
 
 const en: Dict = {
@@ -60,6 +62,7 @@ const en: Dict = {
   errorBody: "The content couldn't be loaded. The server might be temporarily unavailable.",
   errorRetry: "↻ Retry",
   loadingLabel: "Loading…",
+  footerTagline: "built with Django + Next.js + Claude Code",
 };
 
 export const DICTS: Record<Locale, Dict> = { fr, en };

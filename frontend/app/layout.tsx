@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Fraunces, Source_Serif_4, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import { localeFromHeaders } from "@/shared/i18n/server-locale";
 import "./globals.css";
 
 const display = Fraunces({ subsets: ["latin"], variable: "--font-display", weight: ["400", "700", "900"] });
@@ -13,9 +14,10 @@ export const metadata: Metadata = {
   description: "Tests, problèmes, solutions — parfois en 3D.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const lang = await localeFromHeaders();
   return (
-    <html lang="fr" className={`${display.variable} ${body.variable} ${mono.variable} ${ui.variable}`}>
+    <html lang={lang} className={`${display.variable} ${body.variable} ${mono.variable} ${ui.variable}`}>
       <head>
         <script
           dangerouslySetInnerHTML={{

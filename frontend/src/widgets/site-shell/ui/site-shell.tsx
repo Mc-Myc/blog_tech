@@ -34,7 +34,7 @@ export function SiteShell(
           <span>© 2026 Marcel Yapo</span>
           <a href="/rss.xml">RSS</a>
           <a href="/llms.txt">llms.txt</a>
-          <span style={{ marginLeft: "auto" }}>fait avec Django + Next.js + Claude Code</span>
+          <span style={{ marginLeft: "auto" }}>{tr.footerTagline}</span>
         </div>
       </footer>
     </>
