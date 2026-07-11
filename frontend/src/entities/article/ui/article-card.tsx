@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Locale } from "@/shared/config";
+import { t } from "@/shared/i18n";
 import { TagBadge } from "@/entities/tag/@x/article";
 import type { ArticleListItem } from "../model/types";
 import styles from "./article-card.module.css";
@@ -15,7 +16,7 @@ export function ArticleCard({ article, locale }: { article: ArticleListItem; loc
       </div>
       <h3 className={styles.title}>{article.title}</h3>
       <p className={styles.excerpt}>{article.excerpt}</p>
-      <div className={styles.meta}>{date} · {article.readingTime} min de lecture</div>
+      <div className={styles.meta}>{date} · {article.readingTime} {t(locale).reading}</div>
     </Link>
   );
 }

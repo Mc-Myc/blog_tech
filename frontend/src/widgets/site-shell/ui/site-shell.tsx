@@ -18,9 +18,9 @@ export function SiteShell(
         <div className={styles.inner}>
           <Link className={styles.logo} href={`/${locale}`}>~/blog<span className={styles.p}>_tech</span></Link>
           <div className={styles.links}>
-            <Link className={cls("articles")} href={`/${locale}`}>{tr.nav.articles}</Link>
-            <Link className={cls("series")} href={`/${locale}#series`}>{tr.nav.series}</Link>
-            <Link className={cls("search")} href={`/${locale}/search`}>{tr.nav.search}</Link>
+            <Link className={cls("articles")} href={`/${locale}`} aria-current={active === "articles" ? "page" : undefined}>{tr.nav.articles}</Link>
+            <Link className={cls("series")} href={`/${locale}#series`} aria-current={active === "series" ? "page" : undefined}>{tr.nav.series}</Link>
+            <Link className={cls("search")} href={`/${locale}/search`} aria-current={active === "search" ? "page" : undefined}>{tr.nav.search}</Link>
           </div>
           <div className={styles.right}>
             <span className={styles.lang}><b>{locale.toUpperCase()}</b> / <Link href={`/${other}`}>{other.toUpperCase()}</Link></span>
