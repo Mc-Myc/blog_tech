@@ -4,7 +4,10 @@ import { apiGet, ApiError, paginated } from "@/shared/api";
 
 const Item = z.object({ slug: z.string() });
 
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
 
 describe("shared/api", () => {
   it("parse une réponse paginée valide", async () => {

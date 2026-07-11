@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import type { CSSProperties } from "react";
 
 const btn: CSSProperties = {
@@ -8,9 +9,17 @@ const btn: CSSProperties = {
 };
 
 export function ShareBar({ title }: { title: string }) {
+  const [copied, setCopied] = useState(false);
+
   function share(net: "x" | "linkedin" | "copy") {
     const url = window.location.href;
-    if (net === "copy") { void navigator.clipboard?.writeText(url); return; }
+    if (net === "copy") {
+      void navigator.clipboard?.writeText(url).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      });
+      return;
+    }
     const enc = encodeURIComponent(url);
     const href = net === "x"
       ? `https://twitter.com/intent/tweet?url=${enc}&text=${encodeURIComponent(title)}`
@@ -21,7 +30,13 @@ export function ShareBar({ title }: { title: string }) {
     <div role="group" aria-label="partager" style={{ display: "flex", gap: 10, margin: "24px 0" }}>
       <button onClick={() => share("x")} aria-label="partager sur X" style={btn}>𝕏</button>
       <button onClick={() => share("linkedin")} aria-label="partager sur LinkedIn" style={btn}>in</button>
-      <button onClick={() => share("copy")} aria-label="copier le lien" style={btn}>⧉</button>
+      <button
+        onClick={() => share("copy")}
+        aria-label={copied ? "copié !" : "copier le lien"}
+        style={btn}
+      >
+        {copied ? "✓" : "⧉"}
+      </button>
     </div>
   );
 }

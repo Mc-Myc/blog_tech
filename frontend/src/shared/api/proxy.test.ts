@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { proxyText } from "@/shared/api/proxy";
 
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
 
 describe("proxyText", () => {
   it("relaie le corps et pose le content-type", async () => {
@@ -13,6 +16,11 @@ describe("proxyText", () => {
   });
   it("renvoie 502 si l'upstream échoue", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => new Response("", { status: 500 })));
+    const res = await proxyText("/llms.txt", "text/markdown");
+    expect(res.status).toBe(502);
+  });
+  it("renvoie 502 si le fetch réseau échoue", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => { throw new Error("ECONNREFUSED"); }));
     const res = await proxyText("/llms.txt", "text/markdown");
     expect(res.status).toBe(502);
   });
