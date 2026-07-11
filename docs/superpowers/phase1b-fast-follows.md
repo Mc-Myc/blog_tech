@@ -1,8 +1,23 @@
 # Phase 1B — fast-follows (issus de la revue finale de branche, 2026-07-11)
 
 Les 13 tâches du Plan 1B sont livrées et mergées. Les 2 bloqueurs de la revue finale
-sont corrigés (commit `e1f273d` : middleware laisse passer sitemap.xml/robots.txt +
-`metadataBase`). Ce qui suit est non bloquant — à traiter en Phase 1B.1 ou plus tard.
+sont corrigés (commit `e1f273d`). La majorité des fast-follows ci-dessous ont été
+traités dans les commits `60863b0` (lot A : i18n + a11y) et `77067bc` (lot B :
+robustesse + outillage). Statut mis à jour ci-dessous — ✅ fait / ⏳ différé.
+
+**Fait (lots A + B)** : i18n /en (hero, état vide, méta « min read »), `aria-current` ;
+proxyText 502 sur erreur réseau, feedback visuel du bouton copier, anti-flash de thème
+(script inline), `steiger.config` nettoyé (lint:fsd exit 0), `vi.unstubAllGlobals`,
+bump `next` 15.1.6 → 15.1.12 (CVE corrigée).
+
+**Différé (tradeoffs / hors scope safe)** : ⏳ `<html lang>` par locale (déplacer html
+dans `[locale]/layout` casse le routing 404 → vrai arbitrage SSG à faire) ; ⏳
+error/loading/not-found FR sur `/en` (les route boundaries Next n'ont pas le `locale`) ;
+⏳ tagline du footer FR dans SiteShell ; ⏳ `npm audit` : 8 vulns transitives (passe
+supply-chain dédiée).
+
+---
+## Détail d'origine (référence)
 
 ## a11y / i18n (priorité haute)
 - **`<html lang="fr">` codé en dur** (`app/layout.tsx`) → les pages `/en` s'annoncent en
